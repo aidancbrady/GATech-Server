@@ -30,14 +30,18 @@ public class SocketConnection extends Thread
 			
 			while((readerLine = bufferedReader.readLine()) != null && !doneReading)
 			{
-				CommandHandler handler = new CommandHandler(readerLine.trim().toLowerCase());
+				CommandHandler handler = new CommandHandler(printWriter, readerLine.trim().toLowerCase());
 				
 				if(handler.getCommand().equals("msg") && getUser().hasUsername())
 				{
-					getUser().messages.add(handler.getText());
-					printWriter.println("Received message.");
-					System.out.println("Received message from user " + userID + ": " + handler.getText());
-					continue;
+					try {
+						getUser().messages.add(handler.getText());
+						printWriter.println("Received message.");
+						System.out.println("Received message from user " + userID + ": " + handler.getText());
+						continue;
+					} catch(IndexOutOfBoundsException e) {
+						printWriter.println("Invalid command usage.");
+					}
 				}
 				else if(handler.getCommand().equals("msg") && !getUser().hasUsername())
 				{
@@ -47,16 +51,53 @@ public class SocketConnection extends Thread
 				}
 				else if(handler.getCommand().equals("user") && !getUser().hasUsername())
 				{
-					getUser().username = handler.getText();
-					printWriter.println("Username received. You are free to send a message.");
-					System.out.println("User " + userID + " sent username '" + handler.getText() + ".'");
-					continue;
+					try {
+						getUser().username = handler.getText();
+						printWriter.println("Username received. You are free to send a message.");
+						System.out.println("User " + userID + " sent username '" + handler.getText() + ".'");
+						continue;
+					} catch(IndexOutOfBoundsException e) {
+						printWriter.println("Invalid command usage.");
+					}
 				}
 				else if(handler.getCommand().equals("user") && getUser().hasUsername())
 				{
-					printWriter.println("You have already sent your username! Ignoring.");
-					System.out.println("User " + userID + " attempted to send another username.");
-					continue;
+					try {
+						getUser().username = handler.getText();
+						printWriter.println("Successfully changed username.");
+						System.out.println("User " + userID + " changed his username to '" + handler.getText() + ".'");
+						continue;
+					} catch(IndexOutOfBoundsException e) {
+						printWriter.println("Invalid command usage.");
+					}
+				}
+				else if(handler.getCommand().startsWith("info"))
+				{
+					System.out.println("User '" + userID + "' used info command.");
+					try {
+						int id = Integer.parseInt(handler.getText());
+						if(ServerCore.connections.get(id) != null)
+						{
+							printWriter.println("Information on user " + userID + ":");
+							printWriter.println("Username: " + (ServerCore.connections.get(id).hasUsername() ? ServerCore.connections.get(id).username : "unknown"));
+							if(!ServerCore.connections.get(id).messages.isEmpty())
+							{
+								printWriter.println("Logged messages:");
+								for(String message : ServerCore.connections.get(id).messages)
+								{
+									System.out.println(message);
+								}
+							}
+							else {
+								printWriter.println("No messages found for this user.");
+							}
+						}	
+						else {
+							printWriter.println("Unable to find database for user '" + userID + ".'");
+						}
+					} catch(IndexOutOfBoundsException e) {
+						printWriter.println("Invalid command usage.");
+					}
 				}
 				else if(handler.getCommand().equals("done"))
 				{

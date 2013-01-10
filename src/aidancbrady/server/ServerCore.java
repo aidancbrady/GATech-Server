@@ -90,6 +90,7 @@ public final class ServerCore
 										if(connections.get(userID) != null)
 										{
 											connections.get(userID).connection.kick();
+											System.out.println("Kicked user '" + userID + ".'");
 										}	
 										else {
 											System.err.println("Unable to find database for user '" + userID + ".'");
@@ -102,13 +103,38 @@ public final class ServerCore
 									System.out.println("Usage: 'user kick <ID>'");
 								}
 							}
+							else if(commandArgs[1].equals("list"))
+							{
+								if(commandArgs.length == 2)
+								{
+									System.out.println("Currently connected users:");
+									for(ServerConnection connection : connections.values())
+									{
+										StringBuilder string = new StringBuilder();
+										string.append("User " + connection.userID + " " + (connection.hasUsername() ? "(" + connection.username + ")" : "(no username found)"));
+										System.out.println(string);
+									}
+								}
+								else {
+									System.out.println("Usage: 'user list'");
+								}
+							}
 						}
 						else {
 							System.out.println("-- User Control Panel --");
 							System.out.println("Command help:");
 							System.out.println("'user info <ID>' - displays a user's information.");
 							System.out.println("'user kick <ID>' - kicks a user from the server.");
+							System.out.println("'user list' - lists all currently connected users.");
 						}
+					}
+					else if(command.equals("help"))
+					{
+						System.out.println("-- Server Command Center --");
+						System.out.println("Command help:");
+						System.out.println("'stop' - stops the server if it is running.");
+						System.out.println("'quit' - stops the server if it is running and terminates the program.");
+						System.out.println("'user <params>' - reads information from the user.");
 					}
 					else {
 						System.out.println("Unknown command.");

@@ -1,11 +1,15 @@
 package aidancbrady.server;
 
+import java.io.PrintWriter;
+
 public class CommandHandler 
 {
 	public String command;
+	public PrintWriter printWriter;
 	
-	public CommandHandler(String s)
+	public CommandHandler(PrintWriter writer, String s)
 	{
+		printWriter = writer;
 		command = s;
 	}
 	
@@ -20,6 +24,8 @@ public class CommandHandler
 				return CommandType.USERNAME;
 			case "done":
 				return CommandType.DONE;
+			case "info":
+				return CommandType.INFO;
 			default:
 				return CommandType.UNKNOWN;
 		}
@@ -34,7 +40,7 @@ public class CommandHandler
 	{
 		if(interpret().hasSplitter())
 		{
-			return command.split(":")[1];
+			return command.split(":")[1].trim();
 		}
 		
 		return null;
@@ -45,6 +51,7 @@ public class CommandHandler
 		MESSAGE(true),
 		USERNAME(true),
 		DONE(false),
+		INFO(true),
 		UNKNOWN(false);
 		
 		private boolean hasSplitter;
