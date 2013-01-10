@@ -148,7 +148,15 @@ public final class ServerCore
 				serverSocket.close();
 			}
 			
+			for(ServerConnection connection : connections.values())
+			{
+				connection.connection.connection.close();
+			}
+			
+			connections.clear();
+			
 			System.out.println("Goodbye!");
+			System.exit(0);
 		} catch (Exception e)
 		{
 			System.err.println("Error: " + e.getMessage());
