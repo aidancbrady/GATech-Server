@@ -17,6 +17,7 @@ public class SocketConnection extends Thread
 		connection = accept;
 	}
 	
+	@Override
 	public void run()
 	{
 		try {
@@ -39,7 +40,7 @@ public class SocketConnection extends Thread
 						printWriter.println("Received message.");
 						System.out.println("Received message from user " + userID + ": " + handler.getText());
 						continue;
-					} catch(IndexOutOfBoundsException e) {
+					} catch(Exception e) {
 						printWriter.println("Invalid command usage.");
 					}
 				}
@@ -56,7 +57,7 @@ public class SocketConnection extends Thread
 						printWriter.println("Username received. You are free to send a message.");
 						System.out.println("User " + userID + " sent username '" + handler.getText() + ".'");
 						continue;
-					} catch(IndexOutOfBoundsException e) {
+					} catch(Exception e) {
 						printWriter.println("Invalid command usage.");
 					}
 				}
@@ -67,7 +68,7 @@ public class SocketConnection extends Thread
 						printWriter.println("Successfully changed username.");
 						System.out.println("User " + userID + " changed his username to '" + handler.getText() + ".'");
 						continue;
-					} catch(IndexOutOfBoundsException e) {
+					} catch(Exception e) {
 						printWriter.println("Invalid command usage.");
 					}
 				}
@@ -95,7 +96,7 @@ public class SocketConnection extends Thread
 						else {
 							printWriter.println("Unable to find database for user '" + userID + ".'");
 						}
-					} catch(IndexOutOfBoundsException e) {
+					} catch(Exception e) {
 						printWriter.println("Invalid command usage.");
 					}
 				}
