@@ -86,7 +86,7 @@ public class SocketConnection extends Thread
 								printWriter.println("Logged messages:");
 								for(String message : ServerCore.connections.get(id).messages)
 								{
-									System.out.println(message);
+									printWriter.println(message);
 								}
 							}
 							else {
