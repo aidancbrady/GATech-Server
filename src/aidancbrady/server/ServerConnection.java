@@ -5,11 +5,9 @@ import java.util.List;
 
 public class ServerConnection
 {
-	public String username = "";
+	public User user;
 	public SocketConnection connection;
 	public int userID;
-	
-	public List<String> messages = new ArrayList<String>();
 	
 	public ServerConnection(int id, SocketConnection socket)
 	{
@@ -19,6 +17,6 @@ public class ServerConnection
 	
 	public boolean hasUsername()
 	{
-		return username != "";
+		return user != null && user.username != "";
 	}
 }

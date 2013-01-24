@@ -15,12 +15,15 @@ public final class ServerCore
 	public static Scanner scanner = new Scanner(System.in);
 	public static int usersConnected = 0;
 	public static Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
+	public static Map<String, User> users = new HashMap<String, User>();
 	
 	//Going to try and use port 3073
 	public static void main(String[] args)
 	{
 		try {
 			Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+			
+			FileHandler.read();
 			
 			new SocketListener().start();
 			
@@ -57,11 +60,11 @@ public final class ServerCore
 										if(connections.get(userID) != null)
 										{
 											System.out.println("Information on user " + userID + ":");
-											System.out.println("Username: " + (connections.get(userID).hasUsername() ? connections.get(userID).username : "unknown"));
-											if(!connections.get(userID).messages.isEmpty())
+											System.out.println("Username: " + (connections.get(userID).hasUsername() ? connections.get(userID).user.username : "unknown"));
+											if(connections.get(userID).user != null && !connections.get(userID).user.messages.isEmpty())
 											{
 												System.out.println("Logged messages:");
-												for(String message : connections.get(userID).messages)
+												for(String message : connections.get(userID).user.messages)
 												{
 													System.out.println(message);
 												}
@@ -79,6 +82,52 @@ public final class ServerCore
 								}
 								else {
 									System.out.println("Usage: 'user info <ID>'");
+								}
+							}
+							else if(commandArgs[1].equals("cache"))
+							{
+								if(commandArgs.length == 3)
+								{
+									String name = commandArgs[2];
+									if(users.get(name) != null)
+									{
+										System.out.println("Information on user " + name + ":");
+										System.out.println("Online: " + (users.get(name).isOnline() ? "Yes (" + users.get(name).getConnection().userID + ")" : "No"));
+										if(!users.get(name).messages.isEmpty())
+										{
+											System.out.println("Logged messages:");
+											for(String message : users.get(name).messages)
+											{
+												System.out.println(message);
+											}
+										}
+										else {
+											System.out.println("No messages found for this user.");
+										}
+									}
+									else {
+										System.err.println("Unable to find database for user '" + name + ".'");
+									}
+								}
+								else {
+									System.out.println("Usage: 'user cache <username>'");
+								}
+							}
+							else if(commandArgs[1].equals("remove"))
+							{
+								if(commandArgs.length == 3)
+								{
+									if(!users.containsKey(commandArgs[2]))
+									{
+										System.err.println("User '" + commandArgs[2] + "' does not exist.");
+									}
+									else {
+										users.remove(commandArgs[2]);
+										System.out.println("Successfully removed user '" + commandArgs[2] + "' from cached map.");
+									}
+								}
+								else {
+									System.out.println("Usage: 'user remove <username>'");
 								}
 							}
 							else if(commandArgs[1].equals("kick"))
@@ -111,7 +160,7 @@ public final class ServerCore
 									for(ServerConnection connection : connections.values())
 									{
 										StringBuilder string = new StringBuilder();
-										string.append("User " + connection.userID + " " + (connection.hasUsername() ? "(" + connection.username + ")" : "(no username found)"));
+										string.append("User " + connection.userID + " " + (connection.hasUsername() ? "(" + connection.user.username + ")" : "(no username found)"));
 										System.out.println(string);
 									}
 								}
@@ -155,6 +204,8 @@ public final class ServerCore
 			
 			connections.clear();
 			
+			FileHandler.write();
+			
 			System.out.println("Goodbye!");
 			System.exit(0);
 		} catch (Exception e)
@@ -179,6 +230,7 @@ public final class ServerCore
 
 class ShutdownHook extends Thread
 {
+	@Override
 	public void run()
 	{
 		try {

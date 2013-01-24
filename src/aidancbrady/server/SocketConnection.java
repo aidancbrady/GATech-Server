@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class SocketConnection extends Thread
 {
@@ -36,7 +37,7 @@ public class SocketConnection extends Thread
 				if(handler.getCommand().equals("msg") && getUser().hasUsername())
 				{
 					try {
-						getUser().messages.add(handler.getText());
+						getUser().user.addMessage(handler.getText());
 						printWriter.println("Received message.");
 						System.out.println("Received message from user " + userID + ": " + handler.getText());
 						continue;
@@ -53,9 +54,22 @@ public class SocketConnection extends Thread
 				else if(handler.getCommand().equals("user") && !getUser().hasUsername())
 				{
 					try {
-						getUser().username = handler.getText();
-						printWriter.println("Username received. You are free to send a message.");
-						System.out.println("User " + userID + " sent username '" + handler.getText() + ".'");
+						if(handler.getText() == "" || handler.getText() == null)
+						{
+							throw new Exception();
+						}
+						
+						if(ServerCore.users.containsKey(handler.getText()))
+						{
+							getUser().user = ServerCore.users.get(handler.getText());
+							printWriter.println("Welcome back, " + handler.getText());
+							System.out.println("User '" + handler.getText() + "' has joined.");
+						}
+						else {
+							getUser().user = new User(handler.getText(), new ArrayList<String>());
+							printWriter.println("Username received. You are free to send a message.");
+							System.out.println("User " + userID + " sent username '" + handler.getText() + ".'");
+						}
 						continue;
 					} catch(Exception e) {
 						printWriter.println("Invalid command usage.");
@@ -64,7 +78,13 @@ public class SocketConnection extends Thread
 				else if(handler.getCommand().equals("user") && getUser().hasUsername())
 				{
 					try {
-						getUser().username = handler.getText();
+						if(handler.getText() == "" || handler.getText() == null)
+						{
+							throw new Exception();
+						}
+						
+						getUser().user.username = handler.getText();
+						
 						printWriter.println("Successfully changed username.");
 						System.out.println("User " + userID + " changed his username to '" + handler.getText() + ".'");
 						continue;
@@ -80,11 +100,11 @@ public class SocketConnection extends Thread
 						if(ServerCore.connections.get(id) != null)
 						{
 							printWriter.println("Information on user " + userID + ":");
-							printWriter.println("Username: " + (ServerCore.connections.get(id).hasUsername() ? ServerCore.connections.get(id).username : "unknown"));
-							if(!ServerCore.connections.get(id).messages.isEmpty())
+							printWriter.println("Username: " + (ServerCore.connections.get(id).hasUsername() ? ServerCore.connections.get(id).user.username : "unknown"));
+							if(ServerCore.connections.get(id).user != null && !ServerCore.connections.get(id).user.messages.isEmpty())
 							{
 								printWriter.println("Logged messages:");
-								for(String message : ServerCore.connections.get(id).messages)
+								for(String message : ServerCore.connections.get(id).user.messages)
 								{
 									printWriter.println(message);
 								}
