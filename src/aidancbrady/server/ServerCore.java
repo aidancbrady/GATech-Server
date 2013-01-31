@@ -1,6 +1,5 @@
 package aidancbrady.server;
 
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +20,6 @@ public final class ServerCore
 	public static void main(String[] args)
 	{
 		try {
-			Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-			
 			FileHandler.read();
 			
 			new SocketListener().start();
@@ -60,7 +57,7 @@ public final class ServerCore
 										if(connections.get(userID) != null)
 										{
 											System.out.println("Information on user " + userID + ":");
-											System.out.println("Username: " + (connections.get(userID).hasUsername() ? connections.get(userID).user.username : "unknown"));
+											System.out.println("Username: " + (connections.get(userID).isAuthenticated() ? connections.get(userID).user.username : "unknown"));
 											if(connections.get(userID).user != null && !connections.get(userID).user.messages.isEmpty())
 											{
 												System.out.println("Logged messages:");
@@ -92,7 +89,7 @@ public final class ServerCore
 									if(users.get(name) != null)
 									{
 										System.out.println("Information on user " + name + ":");
-										System.out.println("Online: " + (users.get(name).isOnline() ? "Yes (" + users.get(name).getConnection().userID + ")" : "No"));
+										System.out.println("Online: " + (users.get(name).isOnline() ? "Yes (ID: " + users.get(name).getConnection().userID + ")" : "No"));
 										if(!users.get(name).messages.isEmpty())
 										{
 											System.out.println("Logged messages:");
@@ -160,7 +157,7 @@ public final class ServerCore
 									for(ServerConnection connection : connections.values())
 									{
 										StringBuilder string = new StringBuilder();
-										string.append("User " + connection.userID + " " + (connection.hasUsername() ? "(" + connection.user.username + ")" : "(no username found)"));
+										string.append("User " + connection.userID + " " + (connection.isAuthenticated() ? "(" + connection.user.username + ")" : "(no username found)"));
 										System.out.println(string);
 									}
 								}
@@ -238,9 +235,11 @@ class ShutdownHook extends Thread
 			{
 				ServerCore.serverSocket.close();
 			}
-		} catch (IOException e) {
-			System.err.println("Error: " + e.getMessage());
-			e.printStackTrace();
+			
+			finalize();
+		} catch (Throwable t) {
+			System.err.println("Error: " + t.getMessage());
+			t.printStackTrace();
 		}
 	}
 }

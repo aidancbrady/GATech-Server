@@ -80,8 +80,6 @@ public class FileHandler
 					toWrite = toWrite.substring(0, toWrite.length()-1);
 				}
 				
-				System.out.println(toWrite);
-				
 				writer.append(toWrite);
 				writer.newLine();
 			}

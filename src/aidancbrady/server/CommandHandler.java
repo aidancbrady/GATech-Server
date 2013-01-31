@@ -15,20 +15,7 @@ public class CommandHandler
 	
 	public CommandType interpret()
 	{
-		final String split = command.split(":")[0];
-		switch(split)
-		{
-			case "msg":
-				return CommandType.MESSAGE;
-			case "user":
-				return CommandType.USERNAME;
-			case "done":
-				return CommandType.DONE;
-			case "info":
-				return CommandType.INFO;
-			default:
-				return CommandType.UNKNOWN;
-		}
+		return CommandType.getFromName(command.split(" ")[0]);
 	}
 	
 	public String getCommand()
@@ -36,34 +23,47 @@ public class CommandHandler
 		return command.split(":")[0];
 	}
 	
-	public String getText()
-	{
-		if(interpret().hasSplitter())
-		{
-			return command.split(":")[1].trim();
-		}
-		
-		return null;
-	}
-	
 	public static enum CommandType
 	{
-		MESSAGE(true),
-		USERNAME(true),
-		DONE(false),
-		INFO(true),
-		UNKNOWN(false);
+		USERNAME("user", new CommandUsername()),
+		AUTHENTICATE("auth", new CommandAuthenticate()),
+		DEAUTHENTICATE("deauth", new CommandDeauthenticate()),
+		INFO("info", new CommandInfo()),
+		DELETE("delete", new CommandDelete()),
+		UNKNOWN("null", null);
 		
-		private boolean hasSplitter;
+		private String name;
+		private ICommand command;
 		
-		public boolean hasSplitter()
+		public static CommandType getFromName(String name)
 		{
-			return hasSplitter;
+			for(CommandType type : values())
+			{
+				if(type.name.equals(name.replace("/", "")))
+				{
+					return type;
+				}
+			}
+			
+			return UNKNOWN;
 		}
 		
-		private CommandType(boolean splitter)
+		public void handle(SocketConnection connection, CommandHandler handler)
 		{
-			hasSplitter = splitter;
+			if(equals(UNKNOWN))
+			{
+				handler.printWriter.println("Unknown command.");
+				return;
+			}
+			
+			System.out.println("");
+			command.handle(connection, handler.command.split(" "), handler.printWriter);
+		}
+		
+		private CommandType(String s, ICommand icommand)
+		{
+			name = s;
+			command = icommand;
 		}
 	}
 }

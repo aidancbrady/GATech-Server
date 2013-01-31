@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class SocketConnection extends Thread
 {
@@ -32,104 +31,34 @@ public class SocketConnection extends Thread
 			
 			while((readerLine = bufferedReader.readLine()) != null && !doneReading)
 			{
-				CommandHandler handler = new CommandHandler(printWriter, readerLine.trim().toLowerCase());
+				if(readerLine.trim().startsWith("/"))
+				{
+					if(readerLine.trim().contains("/quit"))
+					{
+						printWriter.println("Received 'done' notification -- closing connection...");
+						System.out.println("User " + userID + " has ended the connection.");
+						doneReading = true;
+						break;
+					}
+					
+					CommandHandler handler = new CommandHandler(printWriter, readerLine.trim().toLowerCase().replace("/", ""));
+					handler.interpret().handle(this, handler);
+					continue;
+				}
 				
-				if(handler.getCommand().equals("msg") && getUser().hasUsername())
-				{
-					try {
-						getUser().user.addMessage(handler.getText());
-						printWriter.println("Received message.");
-						System.out.println("Received message from user " + userID + ": " + handler.getText());
-						continue;
-					} catch(Exception e) {
-						printWriter.println("Invalid command usage.");
+				try {
+					if(getUser().isAuthenticated())
+					{
+						getUser().user.addMessage(readerLine.trim());
+						System.out.println(getUser().user.username + ": " + readerLine.trim());
 					}
-				}
-				else if(handler.getCommand().equals("msg") && !getUser().hasUsername())
-				{
-					printWriter.println("Please provide a username before you send a message.");
-					System.out.println("User " + userID + " attempted to send a message without a username.");
+					else {
+						printWriter.println("Please authenticate before you send a message.");
+						System.out.println("User " + userID + " attempted to send a message without authentication.");
+					}
 					continue;
-				}
-				else if(handler.getCommand().equals("user") && !getUser().hasUsername())
-				{
-					try {
-						if(handler.getText() == "" || handler.getText() == null)
-						{
-							throw new Exception();
-						}
-						
-						if(ServerCore.users.containsKey(handler.getText()))
-						{
-							getUser().user = ServerCore.users.get(handler.getText());
-							printWriter.println("Welcome back, " + handler.getText());
-							System.out.println("User '" + handler.getText() + "' has joined.");
-						}
-						else {
-							getUser().user = new User(handler.getText(), new ArrayList<String>());
-							printWriter.println("Username received. You are free to send a message.");
-							System.out.println("User " + userID + " sent username '" + handler.getText() + ".'");
-						}
-						continue;
-					} catch(Exception e) {
-						printWriter.println("Invalid command usage.");
-					}
-				}
-				else if(handler.getCommand().equals("user") && getUser().hasUsername())
-				{
-					try {
-						if(handler.getText() == "" || handler.getText() == null)
-						{
-							throw new Exception();
-						}
-						
-						getUser().user.username = handler.getText();
-						
-						printWriter.println("Successfully changed username.");
-						System.out.println("User " + userID + " changed his username to '" + handler.getText() + ".'");
-						continue;
-					} catch(Exception e) {
-						printWriter.println("Invalid command usage.");
-					}
-				}
-				else if(handler.getCommand().startsWith("info"))
-				{
-					System.out.println("User '" + userID + "' used info command.");
-					try {
-						int id = Integer.parseInt(handler.getText());
-						if(ServerCore.connections.get(id) != null)
-						{
-							printWriter.println("Information on user " + userID + ":");
-							printWriter.println("Username: " + (ServerCore.connections.get(id).hasUsername() ? ServerCore.connections.get(id).user.username : "unknown"));
-							if(ServerCore.connections.get(id).user != null && !ServerCore.connections.get(id).user.messages.isEmpty())
-							{
-								printWriter.println("Logged messages:");
-								for(String message : ServerCore.connections.get(id).user.messages)
-								{
-									printWriter.println(message);
-								}
-							}
-							else {
-								printWriter.println("No messages found for this user.");
-							}
-						}	
-						else {
-							printWriter.println("Unable to find database for user '" + userID + ".'");
-						}
-					} catch(Exception e) {
-						printWriter.println("Invalid command usage.");
-					}
-				}
-				else if(handler.getCommand().equals("done"))
-				{
-					printWriter.println("Received 'done' notification -- closing connection...");
-					System.out.println("User " + userID + " has ended the connection.");
-					doneReading = true;
-					break;
-				}
-				else {
-					printWriter.println("Unknown command.");
-					continue;
+				} catch(Exception e) {
+					printWriter.println("Invalid message.");
 				}
 			}
 			

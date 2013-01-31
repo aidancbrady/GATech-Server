@@ -1,8 +1,5 @@
 package aidancbrady.server;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ServerConnection
 {
 	public User user;
@@ -15,7 +12,7 @@ public class ServerConnection
 		connection = socket;
 	}
 	
-	public boolean hasUsername()
+	public boolean isAuthenticated()
 	{
 		return user != null && user.username != "";
 	}
