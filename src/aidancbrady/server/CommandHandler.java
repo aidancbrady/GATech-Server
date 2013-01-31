@@ -56,7 +56,6 @@ public class CommandHandler
 				return;
 			}
 			
-			System.out.println("");
 			command.handle(connection, handler.command.split(" "), handler.printWriter);
 		}
 		

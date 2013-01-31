@@ -1,5 +1,6 @@
 package aidancbrady.server;
 
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
@@ -222,6 +223,23 @@ public final class ServerCore
 	{
 		usersConnected--;
 		connections.remove(userId);
+	}
+	
+	public static void handleMessage(User sender, String message)
+	{
+		for(ServerConnection connection : connections.values())
+		{
+			if(!connection.isAuthenticated() || connection.user.username != sender.username)
+			{
+				try {
+					PrintWriter printWriter = new PrintWriter(connection.connection.connection.getOutputStream(), true);
+					printWriter.println(message);
+				} catch(Exception e) {
+					System.out.println("An error occured while notifying other users.");
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }
 

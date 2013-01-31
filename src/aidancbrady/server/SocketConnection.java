@@ -37,6 +37,12 @@ public class SocketConnection extends Thread
 					{
 						printWriter.println("Received 'done' notification -- closing connection...");
 						System.out.println("User " + userID + " has ended the connection.");
+						
+						if(getUser().isAuthenticated())
+						{
+							ServerCore.handleMessage(getUser().user, "<" + getUser().user.username + " has quit>");
+						}
+						
 						doneReading = true;
 						break;
 					}
@@ -51,6 +57,7 @@ public class SocketConnection extends Thread
 					{
 						getUser().user.addMessage(readerLine.trim());
 						System.out.println(getUser().user.username + ": " + readerLine.trim());
+						ServerCore.handleMessage(getUser().user, getUser().user.username + ": " + readerLine.trim());
 					}
 					else {
 						printWriter.println("Please authenticate before you send a message.");
@@ -59,6 +66,7 @@ public class SocketConnection extends Thread
 					continue;
 				} catch(Exception e) {
 					printWriter.println("Invalid message.");
+					e.printStackTrace();
 				}
 			}
 			
