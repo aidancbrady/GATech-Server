@@ -28,14 +28,16 @@ public class CommandHandler
 	
 	public static enum CommandType
 	{
-		USERNAME("user", new CommandUsername()),
-		AUTHENTICATE("auth", new CommandAuthenticate()),
-		DEAUTHENTICATE("deauth", new CommandDeauthenticate()),
-		INFO("info", new CommandInfo()),
-		DELETE("delete", new CommandDelete()),
-		UNKNOWN("null", null);
+		USERNAME("user", " /user <username> - change your username", new CommandUsername()),
+		AUTHENTICATE("auth", " /auth - authenticate in network", new CommandAuthenticate()),
+		DEAUTHENTICATE("deauth", " /deauth - deauthenticate from network", new CommandDeauthenticate()),
+		INFO("info", " /info <id> - get information on a user ID", new CommandInfo()),
+		DELETE("delete", " /delete - delete your profile", new CommandDelete()),
+		HELP("help", " /help - view this page", new CommandHelp()),
+		UNKNOWN("null", "null", null);
 		
 		private String name;
+		private String usage;
 		private ICommand command;
 		
 		public static CommandType getFromName(String name)
@@ -51,6 +53,11 @@ public class CommandHandler
 			return UNKNOWN;
 		}
 		
+		public String getUsage()
+		{
+			return usage;
+		}
+		
 		public void handle(SocketConnection connection, CommandHandler handler)
 		{
 			if(equals(UNKNOWN))
@@ -62,9 +69,10 @@ public class CommandHandler
 			command.handle(connection, handler.command.split(" "), handler.printWriter);
 		}
 		
-		private CommandType(String s, ICommand icommand)
+		private CommandType(String s, String s1, ICommand icommand)
 		{
 			name = s;
+			usage = s1;
 			command = icommand;
 		}
 	}

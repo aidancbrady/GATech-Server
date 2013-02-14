@@ -55,19 +55,22 @@ public class SocketConnection extends Thread
 				}
 				
 				try {
-					if(getUser().isAuthenticated())
+					if(readerLine != null && readerLine.trim() != "")
 					{
-						getUser().user.addMessage(readerLine.trim());
-						System.out.println(getUser().user.username + ": " + readerLine.trim());
-						ServerCore.handleMessage(getUser().user, getUser().user.username + ": " + readerLine.trim());
-					}
-					else {
-						printWriter.println("Please authenticate before you send a message.");
-						System.out.println("User " + userID + " attempted to send a message without authentication.");
+						if(getUser().isAuthenticated())
+						{
+							getUser().user.addMessage(readerLine.trim());
+							System.out.println(getUser().user.username + ": " + readerLine.trim());
+							ServerCore.handleMessage(getUser().user, getUser().user.username + ": " + readerLine.trim());
+						}
+						else {
+							printWriter.println("Please authenticate before you send a message.");
+							System.out.println("User " + userID + " attempted to send a message without authentication.");
+						}
 					}
 					continue;
 				} catch(Exception e) {
-					printWriter.println("Invalid message.");
+					printWriter.println("In valid message.");
 					e.printStackTrace();
 				}
 			}

@@ -16,7 +16,10 @@ public class User
 	
 	public void addMessage(String message)
 	{
-		messages.add(message);
+		if(message != null)
+		{
+			messages.add(message);
+		}
 	}
 	
 	public boolean isOnline()

@@ -15,7 +15,7 @@ public class CommandInfo implements ICommand
 			int id = Integer.parseInt(params[1]);
 			if(ServerCore.connections.get(id) != null)
 			{
-				printWriter.println("Information on user " + connection.userID + ":");
+				printWriter.println("Information on user " + id + ":");
 				printWriter.println("Username: " + (ServerCore.connections.get(id).isAuthenticated() ? ServerCore.connections.get(id).user.username : "unknown"));
 				if(ServerCore.connections.get(id).user != null && !ServerCore.connections.get(id).user.messages.isEmpty())
 				{
