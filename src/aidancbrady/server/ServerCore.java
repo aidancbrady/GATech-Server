@@ -17,7 +17,6 @@ public final class ServerCore
 	public static Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
 	public static Map<String, User> users = new HashMap<String, User>();
 	
-	//Going to try and use port 3073
 	public static void main(String[] args)
 	{
 		try {

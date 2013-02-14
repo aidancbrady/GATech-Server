@@ -1,7 +1,12 @@
-package aidancbrady.server;
+package aidancbrady.server.commands;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import aidancbrady.server.ICommand;
+import aidancbrady.server.ServerCore;
+import aidancbrady.server.SocketConnection;
+import aidancbrady.server.User;
 
 public class CommandAuthenticate implements ICommand
 {

@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import aidancbrady.server.commands.CommandHandler;
+
 public class SocketConnection extends Thread
 {
 	public Socket connection;

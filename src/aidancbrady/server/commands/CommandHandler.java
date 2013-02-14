@@ -1,6 +1,9 @@
-package aidancbrady.server;
+package aidancbrady.server.commands;
 
 import java.io.PrintWriter;
+
+import aidancbrady.server.ICommand;
+import aidancbrady.server.SocketConnection;
 
 public class CommandHandler 
 {

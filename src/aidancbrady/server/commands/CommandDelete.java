@@ -1,6 +1,10 @@
-package aidancbrady.server;
+package aidancbrady.server.commands;
 
 import java.io.PrintWriter;
+
+import aidancbrady.server.ICommand;
+import aidancbrady.server.ServerCore;
+import aidancbrady.server.SocketConnection;
 
 public class CommandDelete implements ICommand
 {
