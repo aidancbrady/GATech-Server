@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 
 import aidancbrady.server.ICommand;
 import aidancbrady.server.SocketConnection;
-import aidancbrady.server.commands.CommandHandler.CommandType;
+import aidancbrady.server.CommandHandler.CommandType;
 
 public class CommandHelp implements ICommand
 {

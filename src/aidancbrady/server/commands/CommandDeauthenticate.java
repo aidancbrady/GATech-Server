@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import aidancbrady.server.ICommand;
 import aidancbrady.server.ServerCore;
 import aidancbrady.server.SocketConnection;
-import aidancbrady.server.User;
 
 public class CommandDeauthenticate implements ICommand
 {
@@ -16,7 +15,7 @@ public class CommandDeauthenticate implements ICommand
 			if(connection.getUser().isAuthenticated())
 			{
 				String username = connection.getUser().user.username;
-				ServerCore.handleMessage(new User(username, null), "<" + username + " has left>");
+				ServerCore.handleMessageIgnore(connection.userID, "<" + username + " has left>");
 				connection.getUser().user = null;
 				System.out.println("User '" + username + "' has deauthenticated.");
 				printWriter.println("Successfully deauthenticated.");

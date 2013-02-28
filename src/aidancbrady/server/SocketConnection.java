@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import aidancbrady.server.commands.CommandHandler;
 
 public class SocketConnection extends Thread
 {
@@ -42,7 +41,7 @@ public class SocketConnection extends Thread
 						
 						if(getUser().isAuthenticated())
 						{
-							ServerCore.handleMessage(getUser().user, "<" + getUser().user.username + " has quit>");
+							ServerCore.handleMessageIgnore(userID, "<" + getUser().user.username + " has quit>");
 						}
 						
 						doneReading = true;
@@ -55,22 +54,22 @@ public class SocketConnection extends Thread
 				}
 				
 				try {
-					if(readerLine != null && readerLine.trim() != "")
+					if(getUser() != null && readerLine != null && readerLine.trim() != "" && !readerLine.isEmpty())
 					{
 						if(getUser().isAuthenticated())
 						{
 							getUser().user.addMessage(readerLine.trim());
 							System.out.println(getUser().user.username + ": " + readerLine.trim());
-							ServerCore.handleMessage(getUser().user, getUser().user.username + ": " + readerLine.trim());
+							ServerCore.handleMessageIgnore(userID, getUser().user.username + ": " + readerLine.trim());
 						}
 						else {
-							printWriter.println("Please authenticate before you send a message.");
-							System.out.println("User " + userID + " attempted to send a message without authentication.");
+							System.out.println("Guest: " + readerLine.trim());
+							ServerCore.handleMessageIgnore(userID, "Guest: " + readerLine.trim());
 						}
 					}
 					continue;
 				} catch(Exception e) {
-					printWriter.println("In valid message.");
+					printWriter.println("Invalid message.");
 					e.printStackTrace();
 				}
 			}

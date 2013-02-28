@@ -19,6 +19,7 @@ public class User
 		if(message != null)
 		{
 			messages.add(message);
+			FileHandler.write();
 		}
 	}
 	

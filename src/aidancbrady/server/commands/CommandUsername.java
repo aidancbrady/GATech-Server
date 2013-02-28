@@ -24,7 +24,7 @@ public class CommandUsername implements ICommand
 					printWriter.println("That username is already taken!");
 				}
 				
-				ServerCore.handleMessage(connection.getUser().user, "<" + connection.getUser().user.username + "'s username was changed to " + params[1] + ">");
+				ServerCore.handleMessageIgnore(connection.userID, "<" + connection.getUser().user.username + "'s username was changed to " + params[1] + ">");
 				connection.getUser().user.username = params[1];
 				printWriter.println("Successfully changed username to " + params[1] + ".");
 				System.out.println("User " + connection.userID + " changed his username to '" + params[1] + ".'");

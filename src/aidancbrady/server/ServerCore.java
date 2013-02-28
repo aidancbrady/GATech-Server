@@ -120,6 +120,7 @@ public final class ServerCore
 									}
 									else {
 										users.remove(commandArgs[2]);
+										FileHandler.write();
 										System.out.println("Successfully removed user '" + commandArgs[2] + "' from cached map.");
 									}
 								}
@@ -155,6 +156,7 @@ public final class ServerCore
 								{
 									System.out.println("Currently connected users:");
 									for(ServerConnection connection : connections.values())
+					
 									{
 										StringBuilder string = new StringBuilder();
 										string.append("User " + connection.userID + " " + (connection.isAuthenticated() ? "(" + connection.user.username + ")" : "(no username found)"));
@@ -224,11 +226,11 @@ public final class ServerCore
 		connections.remove(userId);
 	}
 	
-	public static void handleMessage(User sender, String message)
+	public static void handleMessageIgnore(int id, String message)
 	{
 		for(ServerConnection connection : connections.values())
 		{
-			if(!connection.isAuthenticated() || connection.user.username != sender.username)
+			if(connection.userID != id)
 			{
 				try {
 					PrintWriter printWriter = new PrintWriter(connection.connection.connection.getOutputStream(), true);

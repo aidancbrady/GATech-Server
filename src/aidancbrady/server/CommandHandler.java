@@ -1,9 +1,13 @@
-package aidancbrady.server.commands;
+package aidancbrady.server;
 
 import java.io.PrintWriter;
 
-import aidancbrady.server.ICommand;
-import aidancbrady.server.SocketConnection;
+import aidancbrady.server.commands.CommandAuthenticate;
+import aidancbrady.server.commands.CommandDeauthenticate;
+import aidancbrady.server.commands.CommandDelete;
+import aidancbrady.server.commands.CommandHelp;
+import aidancbrady.server.commands.CommandInfo;
+import aidancbrady.server.commands.CommandUsername;
 
 public class CommandHandler 
 {
@@ -67,6 +71,7 @@ public class CommandHandler
 			}
 			
 			command.handle(connection, handler.command.split(" "), handler.printWriter);
+			FileHandler.write();
 		}
 		
 		private CommandType(String s, String s1, ICommand icommand)
