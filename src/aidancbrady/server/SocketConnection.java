@@ -87,7 +87,7 @@ public class SocketConnection extends Thread
 			} catch (Throwable e) {
 				System.err.println("Unable to close connection thread! Error: " + e.getMessage());
 			}
-		} catch(IOException e) {
+		} catch(Throwable e) {
 			if(!e.getMessage().trim().toLowerCase().equals("socket closed"))
 			{
 				System.err.println("Error: " + e.getMessage());

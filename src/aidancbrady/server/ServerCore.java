@@ -19,6 +19,7 @@ public final class ServerCore
 	
 	public static void main(String[] args)
 	{
+		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 		try {
 			FileHandler.read();
 			
@@ -83,9 +84,9 @@ public final class ServerCore
 							}
 							else if(commandArgs[1].equals("cache"))
 							{
-								if(commandArgs.length == 3)
+								if(commandArgs.length == 4 && commandArgs[2].equals("info") && !commandArgs[3].equals(""))
 								{
-									String name = commandArgs[2];
+									String name = commandArgs[3];
 									if(users.get(name) != null)
 									{
 										System.out.println("Information on user " + name + ":");
@@ -103,29 +104,41 @@ public final class ServerCore
 										}
 									}
 									else {
-										System.err.println("Unable to find database for user '" + name + ".'");
+										System.err.println("No cache found for user '" + name + ".'");
 									}
 								}
-								else {
-									System.out.println("Usage: 'user cache <username>'");
-								}
-							}
-							else if(commandArgs[1].equals("remove"))
-							{
-								if(commandArgs.length == 3)
+								else if(commandArgs.length == 3 && commandArgs[2].equals("list"))
 								{
-									if(!users.containsKey(commandArgs[2]))
+									System.out.println("Cached users:");
+									for(User user : users.values())
 									{
-										System.err.println("User '" + commandArgs[2] + "' does not exist.");
+										StringBuilder string = new StringBuilder();
+										string.append("User " + user.username + " " + (user.isOnline() ? "(Online)" : "(Offline)"));
+										System.out.println(string);
+									}
+									if(users.isEmpty())
+									{
+										System.out.println("No users found in cache.");
+									}
+								}
+								else if(commandArgs.length == 4 && commandArgs[2].equals("remove") && !commandArgs[3].equals(""))
+								{
+									if(!users.containsKey(commandArgs[3]))
+									{
+										System.err.println("User '" + commandArgs[3] + "' does not exist.");
 									}
 									else {
-										users.remove(commandArgs[2]);
+										users.remove(commandArgs[3]);
 										FileHandler.write();
-										System.out.println("Successfully removed user '" + commandArgs[2] + "' from cached map.");
+										System.out.println("Successfully removed user '" + commandArgs[3] + "' from cached map.");
 									}
 								}
 								else {
-									System.out.println("Usage: 'user remove <username>'");
+									System.out.println("-- Cache Control Panel --");
+									System.out.println("Command help:");
+									System.out.println("'user cache info <username>' - gets and returns info from a user's cache.");
+									System.out.println("'user cache remove <username>' - removes a user's cache.");
+									System.out.println("'user cache list' - lists out all the server's stored client caches.");
 								}
 							}
 							else if(commandArgs[1].equals("kick"))
@@ -156,11 +169,15 @@ public final class ServerCore
 								{
 									System.out.println("Currently connected users:");
 									for(ServerConnection connection : connections.values())
-					
 									{
 										StringBuilder string = new StringBuilder();
 										string.append("User " + connection.userID + " " + (connection.isAuthenticated() ? "(" + connection.user.username + ")" : "(no username found)"));
 										System.out.println(string);
+									}
+									 
+									if(connections.isEmpty())
+									{
+										System.out.println("No users found on server.");
 									}
 								}
 								else {
@@ -174,15 +191,16 @@ public final class ServerCore
 							System.out.println("'user info <ID>' - displays a user's information.");
 							System.out.println("'user kick <ID>' - kicks a user from the server.");
 							System.out.println("'user list' - lists all currently connected users.");
+							System.out.println("'user cache <params>' - cache control panel.");
 						}
 					}
 					else if(command.equals("help"))
 					{
-						System.out.println("-- Server Command Center --");
+						System.out.println("-- Server Control Panel --");
 						System.out.println("Command help:");
 						System.out.println("'stop' - stops the server if it is running.");
 						System.out.println("'quit' - stops the server if it is running and terminates the program.");
-						System.out.println("'user <params>' - reads information from the user.");
+						System.out.println("'user <params>' - user control panel.");
 					}
 					else {
 						System.out.println("Unknown command.");
@@ -236,6 +254,7 @@ public final class ServerCore
 					PrintWriter printWriter = new PrintWriter(connection.connection.connection.getOutputStream(), true);
 					printWriter.println(message);
 				} catch(Exception e) {
+					connection.connection.kick();
 					System.out.println("An error occured while notifying other users.");
 					e.printStackTrace();
 				}

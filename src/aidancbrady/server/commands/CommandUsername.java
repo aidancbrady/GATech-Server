@@ -19,9 +19,10 @@ public class CommandUsername implements ICommand
 			
 			if(connection.getUser().isAuthenticated())
 			{
-				if(ServerCore.users.get(params[1]) != null && ServerCore.users.get(params[1]).isOnline())
+				if(ServerCore.users.get(params[1]) != null)
 				{
 					printWriter.println("That username is already taken!");
+					return;
 				}
 				
 				ServerCore.handleMessageIgnore(connection.userID, "<" + connection.getUser().user.username + "'s username was changed to " + params[1] + ">");
