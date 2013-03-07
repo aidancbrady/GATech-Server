@@ -64,6 +64,7 @@ public class SocketConnection extends Thread
 						}
 						else {
 							System.out.println("Guest: " + readerLine.trim());
+							getUser().tempMessages.add(readerLine.trim());
 							ServerCore.handleMessageIgnore(userID, "Guest: " + readerLine.trim());
 						}
 					}

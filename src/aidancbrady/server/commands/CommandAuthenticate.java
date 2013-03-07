@@ -34,12 +34,20 @@ public class CommandAuthenticate implements ICommand
 				}
 				
 				connection.getUser().user = ServerCore.users.get(params[1]);
+				
+				for(String s : connection.getUser().tempMessages)
+				{
+					connection.getUser().user.messages.add(s);
+				}
+				
+				connection.getUser().tempMessages.clear();
+				
 				printWriter.println("Welcome back, " + params[1]);
 				System.out.println("User '" + params[1] + "' has joined.");
 				ServerCore.handleMessageIgnore(connection.userID, "<" + connection.getUser().user.username + " has joined>");
 			}
 			else {
-				connection.getUser().user = new User(params[1], new ArrayList<String>());
+				connection.getUser().user = new User(params[1], connection.getUser().tempMessages);
 				printWriter.println("Username received. Welcome to the AidanServer!");
 				System.out.println("User " + connection.userID + " sent username '" + params[1] + ".'");
 				ServerCore.handleMessageIgnore(connection.userID, connection.getUser().user.username + " has joined.");

@@ -67,6 +67,14 @@ public final class ServerCore
 													System.out.println(message);
 												}
 											}
+											else if(!connections.get(userID).isAuthenticated() && !connections.get(userID).tempMessages.isEmpty())
+											{
+												System.out.println("Logged messages:");
+												for(String message : connections.get(userID).tempMessages)
+												{
+													System.out.println(message);
+												}
+											}
 											else {
 												System.out.println("No messages found for this user.");
 											}
@@ -150,7 +158,6 @@ public final class ServerCore
 										if(connections.get(userID) != null)
 										{
 											connections.get(userID).connection.kick();
-											System.out.println("Kicked user '" + userID + ".'");
 										}	
 										else {
 											System.err.println("Unable to find database for user '" + userID + ".'");
