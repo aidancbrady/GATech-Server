@@ -2,6 +2,8 @@ package aidancbrady.server.commands;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import aidancbrady.server.ICommand;
 import aidancbrady.server.ServerCore;
@@ -35,7 +37,9 @@ public class CommandAuthenticate implements ICommand
 				
 				connection.getUser().user = ServerCore.users.get(params[1]);
 				
-				for(String s : connection.getUser().tempMessages)
+				ArrayList<String> list = (ArrayList<String>)connection.getUser().tempMessages.clone();
+				
+				for(String s : list)
 				{
 					connection.getUser().user.messages.add(s);
 				}
@@ -47,13 +51,17 @@ public class CommandAuthenticate implements ICommand
 				ServerCore.handleMessageIgnore(connection.userID, "<" + connection.getUser().user.username + " has joined>");
 			}
 			else {
-				connection.getUser().user = new User(params[1], connection.getUser().tempMessages);
+				ArrayList<String> newList = new ArrayList<String>(Arrays.asList(new String[connection.getUser().tempMessages.size()]));
+				Collections.copy(newList, connection.getUser().tempMessages);
+				connection.getUser().user = new User(params[1], (ArrayList<String>)connection.getUser().tempMessages.clone());
+				connection.getUser().tempMessages.clear();
 				printWriter.println("Username received. Welcome to the AidanServer!");
 				System.out.println("User " + connection.userID + " sent username '" + params[1] + ".'");
 				ServerCore.handleMessageIgnore(connection.userID, connection.getUser().user.username + " has joined.");
 			}
 		} catch(Exception e) {
 			printWriter.println("Invalid command usage.");
+			e.printStackTrace();
 		}
 	}
 }

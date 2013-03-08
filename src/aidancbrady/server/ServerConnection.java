@@ -15,6 +15,11 @@ public class ServerConnection
 		connection = socket;
 	}
 	
+	public void deauthenticate()
+	{
+		user = null;
+	}
+	
 	public boolean isAuthenticated()
 	{
 		return user != null && user.username != "";

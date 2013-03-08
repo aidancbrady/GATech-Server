@@ -13,7 +13,7 @@ public class FileHandler
 	public static void read()
 	{
 		try {
-			File file = new File(getHomeDirectory() + "\\Server.txt");
+			File file = new File(getHomeDirectory() + File.separator + "Server.txt");
 			
 			if(!file.exists())
 			{
@@ -52,7 +52,7 @@ public class FileHandler
 	public static void write()
 	{
 		try {
-			File file = new File(getHomeDirectory() + "\\Server.txt");
+			File file = new File(getHomeDirectory() + File.separator + "Server.txt");
 			
 			if(!file.exists())
 			{
