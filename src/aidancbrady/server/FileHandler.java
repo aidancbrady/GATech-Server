@@ -54,14 +54,12 @@ public class FileHandler
 		try {
 			File file = new File(getHomeDirectory() + File.separator + "Server.txt");
 			
-			if(!file.exists())
+			if(file.exists())
 			{
-				file.createNewFile();
-			}
-			else {
 				file.delete();
-				file.createNewFile();
 			}
+			
+			file.createNewFile();
 			
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			

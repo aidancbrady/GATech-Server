@@ -5,14 +5,14 @@ import java.util.ArrayList;
 public class ServerConnection
 {
 	public User user;
-	public SocketConnection connection;
+	public SocketConnection socketConnection;
 	public int userID;
 	public ArrayList<String> tempMessages = new ArrayList<String>();
 	
 	public ServerConnection(int id, SocketConnection socket)
 	{
 		userID = id;
-		connection = socket;
+		socketConnection = socket;
 	}
 	
 	public void deauthenticate()

@@ -32,6 +32,7 @@ public final class ServerCore
 				if(scanner.hasNextLine())
 				{
 					String command = scanner.nextLine().trim().toLowerCase();
+					String[] commandArgs = command.split(" ");
 					
 					if(command.equals("stop"))
 					{
@@ -46,7 +47,6 @@ public final class ServerCore
 					}
 					else if(command.startsWith("user"))
 					{
-						String[] commandArgs = command.split(" ");
 						if(commandArgs.length > 1)
 						{
 							if(commandArgs[1].equals("info"))
@@ -136,6 +136,15 @@ public final class ServerCore
 										System.err.println("User '" + commandArgs[3] + "' does not exist.");
 									}
 									else {
+										User user = users.get(commandArgs[3]);
+										
+										if(user.isOnline())
+										{
+											System.out.println("User '" + user.username + "' has deauthenticated.");
+											ServerCore.distributeMessageIgnore(user.getConnection().userID, "<" + user.username + " has left>");
+											user.getConnection().deauthenticate();
+										}
+										
 										users.remove(commandArgs[3]);
 										FileHandler.write();
 										System.out.println("Successfully removed user '" + commandArgs[3] + "' from cached map.");
@@ -157,7 +166,7 @@ public final class ServerCore
 										int userID = Integer.parseInt(commandArgs[2]);
 										if(connections.get(userID) != null)
 										{
-											connections.get(userID).connection.kick();
+											connections.get(userID).socketConnection.kick();
 										}	
 										else {
 											System.err.println("Unable to find database for user '" + userID + ".'");
@@ -201,12 +210,23 @@ public final class ServerCore
 							System.out.println("'user cache <params>' - cache control panel.");
 						}
 					}
+					else if(command.startsWith("msg"))
+					{
+						if(commandArgs.length == 2)
+						{
+							distributeMessageIgnore(-1, "Console: " + commandArgs[1]);
+						}
+						else {
+							System.out.println("Usage: 'msg <message>'");
+						}
+					}
 					else if(command.equals("help"))
 					{
 						System.out.println("-- Server Control Panel --");
 						System.out.println("Command help:");
 						System.out.println("'stop' - stops the server if it is running.");
 						System.out.println("'quit' - stops the server if it is running and terminates the program.");
+						System.out.println("'msg <message>' - distributes the given message to users as 'Console.'");
 						System.out.println("'user <params>' - user control panel.");
 					}
 					else {
@@ -223,7 +243,7 @@ public final class ServerCore
 			
 			for(ServerConnection connection : connections.values())
 			{
-				connection.connection.connection.close();
+				connection.socketConnection.socket.close();
 			}
 			
 			connections.clear();
@@ -241,8 +261,7 @@ public final class ServerCore
 	
 	public static int newConnection()
 	{
-		usersConnected++;
-		return usersConnected;
+		return ++usersConnected;
 	}
 	
 	public static void removeConnection(int userId)
@@ -251,17 +270,17 @@ public final class ServerCore
 		connections.remove(userId);
 	}
 	
-	public static void handleMessageIgnore(int id, String message)
+	public static void distributeMessageIgnore(int id, String message)
 	{
 		for(ServerConnection connection : connections.values())
 		{
 			if(connection.userID != id)
 			{
 				try {
-					PrintWriter printWriter = new PrintWriter(connection.connection.connection.getOutputStream(), true);
+					PrintWriter printWriter = new PrintWriter(connection.socketConnection.socket.getOutputStream(), true);
 					printWriter.println(message);
 				} catch(Exception e) {
-					connection.connection.kick();
+					connection.socketConnection.kick();
 					System.out.println("An error occured while notifying other users.");
 					e.printStackTrace();
 				}

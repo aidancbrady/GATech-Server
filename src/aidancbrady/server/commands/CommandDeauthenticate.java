@@ -12,11 +12,11 @@ public class CommandDeauthenticate implements ICommand
 	public void handle(SocketConnection connection, String[] params, PrintWriter printWriter)
 	{
 		try {
-			if(connection.getUser().isAuthenticated())
+			if(connection.getServerConnection().isAuthenticated())
 			{
-				String username = connection.getUser().user.username;
-				ServerCore.handleMessageIgnore(connection.userID, "<" + username + " has left>");
-				connection.getUser().deauthenticate();
+				String username = connection.getServerConnection().user.username;
+				ServerCore.distributeMessageIgnore(connection.userID, "<" + username + " has left>");
+				connection.getServerConnection().deauthenticate();
 				System.out.println("User '" + username + "' has deauthenticated.");
 				printWriter.println("Successfully deauthenticated.");
 			}

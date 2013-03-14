@@ -29,10 +29,7 @@ public class User
 		{
 			if(connection.user != null)
 			{
-				if(connection.user.username == username)
-				{
-					return true;
-				}
+				return connection.user.username == username;
 			}
 		}
 		

@@ -11,13 +11,13 @@ public class CommandDelete implements ICommand
 	@Override
 	public void handle(SocketConnection connection, String[] params, PrintWriter printWriter)
 	{
-		if(connection.getUser().isAuthenticated())
+		if(connection.getServerConnection().isAuthenticated())
 		{
-			String username = connection.getUser().user.username;
+			String username = connection.getServerConnection().user.username;
 			ServerCore.users.remove(username);
 			printWriter.println("Successfully removed you from the cached user map. You are no longer authenticated.");
-			ServerCore.handleMessageIgnore(connection.userID, "<" + username + " has left>");
-			connection.getUser().deauthenticate();
+			ServerCore.distributeMessageIgnore(connection.userID, "<" + username + " has left>");
+			connection.getServerConnection().deauthenticate();
 			System.out.println("Successfully removed user '" + username + "' from cached map.");
 		}
 		else {

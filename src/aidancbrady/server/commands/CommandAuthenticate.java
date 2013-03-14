@@ -21,7 +21,7 @@ public class CommandAuthenticate implements ICommand
 				throw new Exception();
 			}
 			
-			if(connection.getUser().isAuthenticated())
+			if(connection.getServerConnection().isAuthenticated())
 			{
 				printWriter.println("You are already authenticated!");
 				return;
@@ -35,29 +35,29 @@ public class CommandAuthenticate implements ICommand
 					return;
 				}
 				
-				connection.getUser().user = ServerCore.users.get(params[1]);
+				connection.getServerConnection().user = ServerCore.users.get(params[1]);
 				
-				ArrayList<String> list = (ArrayList<String>)connection.getUser().tempMessages.clone();
+				ArrayList<String> list = (ArrayList<String>)connection.getServerConnection().tempMessages.clone();
 				
 				for(String s : list)
 				{
-					connection.getUser().user.messages.add(s);
+					connection.getServerConnection().user.messages.add(s);
 				}
 				
-				connection.getUser().tempMessages.clear();
+				connection.getServerConnection().tempMessages.clear();
 				
 				printWriter.println("Welcome back, " + params[1]);
 				System.out.println("User '" + params[1] + "' has joined.");
-				ServerCore.handleMessageIgnore(connection.userID, "<" + connection.getUser().user.username + " has joined>");
+				ServerCore.distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + " has joined>");
 			}
 			else {
-				ArrayList<String> newList = new ArrayList<String>(Arrays.asList(new String[connection.getUser().tempMessages.size()]));
-				Collections.copy(newList, connection.getUser().tempMessages);
-				connection.getUser().user = new User(params[1], (ArrayList<String>)connection.getUser().tempMessages.clone());
-				connection.getUser().tempMessages.clear();
+				ArrayList<String> newList = new ArrayList<String>(Arrays.asList(new String[connection.getServerConnection().tempMessages.size()]));
+				Collections.copy(newList, connection.getServerConnection().tempMessages);
+				connection.getServerConnection().user = new User(params[1], (ArrayList<String>)connection.getServerConnection().tempMessages.clone());
+				connection.getServerConnection().tempMessages.clear();
 				printWriter.println("Username received. Welcome to the AidanServer!");
 				System.out.println("User " + connection.userID + " sent username '" + params[1] + ".'");
-				ServerCore.handleMessageIgnore(connection.userID, connection.getUser().user.username + " has joined.");
+				ServerCore.distributeMessageIgnore(connection.userID, connection.getServerConnection().user.username + " has joined.");
 			}
 		} catch(Exception e) {
 			printWriter.println("Invalid command usage.");

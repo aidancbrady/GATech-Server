@@ -9,21 +9,21 @@ import java.net.Socket;
 
 public class SocketConnection extends Thread
 {
-	public Socket connection;
+	public Socket socket;
 	public int userID;
 	
 	public SocketConnection(int id, Socket accept)
 	{
 		userID = id;
-		connection = accept;
+		socket = accept;
 	}
 	
 	@Override
 	public void run()
 	{
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			PrintWriter printWriter = new PrintWriter(connection.getOutputStream(), true);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
 			
 			printWriter.println("Please identify yourself with a username.");
 			
@@ -39,9 +39,9 @@ public class SocketConnection extends Thread
 						printWriter.println("Received 'done' notification -- closing connection...");
 						System.out.println("User " + userID + " has ended the connection.");
 						
-						if(getUser().isAuthenticated())
+						if(getServerConnection().isAuthenticated())
 						{
-							ServerCore.handleMessageIgnore(userID, "<" + getUser().user.username + " has quit>");
+							ServerCore.distributeMessageIgnore(userID, "<" + getServerConnection().user.username + " has quit>");
 						}
 						
 						doneReading = true;
@@ -54,18 +54,18 @@ public class SocketConnection extends Thread
 				}
 				
 				try {
-					if(getUser() != null && readerLine != null && readerLine.trim() != "" && !readerLine.isEmpty())
+					if(getServerConnection() != null && readerLine != null && readerLine.trim() != "" && !readerLine.isEmpty())
 					{
-						if(getUser().isAuthenticated())
+						if(getServerConnection().isAuthenticated())
 						{
-							getUser().user.addMessage(readerLine.trim());
-							System.out.println(getUser().user.username + ": " + readerLine.trim());
-							ServerCore.handleMessageIgnore(userID, getUser().user.username + ": " + readerLine.trim());
+							getServerConnection().user.addMessage(readerLine.trim());
+							System.out.println(getServerConnection().user.username + ": " + readerLine.trim());
+							ServerCore.distributeMessageIgnore(userID, getServerConnection().user.username + ": " + readerLine.trim());
 						}
 						else {
 							System.out.println("Guest: " + readerLine.trim());
-							getUser().tempMessages.add(readerLine.trim());
-							ServerCore.handleMessageIgnore(userID, "Guest: " + readerLine.trim());
+							getServerConnection().tempMessages.add(readerLine.trim());
+							ServerCore.distributeMessageIgnore(userID, "Guest: " + readerLine.trim());
 						}
 					}
 					continue;
@@ -82,7 +82,7 @@ public class SocketConnection extends Thread
 			
 			bufferedReader.close();
 			printWriter.close();
-			connection.close();
+			socket.close();
 			try {
 				finalize();
 			} catch (Throwable e) {
@@ -95,25 +95,15 @@ public class SocketConnection extends Thread
 				e.printStackTrace();
 			}
 			
-			try {
-				connection.close();
-				
-				try {
-					finalize();
-				} catch (Throwable e1) {
-					System.err.println("Unable to close connection thread! Error: " + e1.getMessage());
-				}
-			} catch(IOException e1) {
-				System.err.println("Could not close connection! Error: " + e1.getMessage());
-			}
+			kick();
 		}
 	}
 	
 	public void kick()
 	{
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			PrintWriter printWriter = new PrintWriter(connection.getOutputStream(), true);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
 			
 			printWriter.println("You have been kicked!");
 			System.out.println("Kicked user '" + userID + ".'");
@@ -121,7 +111,7 @@ public class SocketConnection extends Thread
 			ServerCore.removeConnection(userID);
 			bufferedReader.close();
 			printWriter.close();
-			connection.close();
+			socket.close();
 			
 			try {
 				finalize();
@@ -136,7 +126,7 @@ public class SocketConnection extends Thread
 			}
 			
 			try {
-				connection.close();
+				socket.close();
 				
 				try {
 					finalize();
@@ -149,7 +139,7 @@ public class SocketConnection extends Thread
 		}
 	}
 	
-	public ServerConnection getUser()
+	public ServerConnection getServerConnection()
 	{
 		return ServerCore.connections.get(userID);
 	}
