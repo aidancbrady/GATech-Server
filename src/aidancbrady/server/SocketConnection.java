@@ -37,7 +37,7 @@ public class SocketConnection extends Thread
 					if(readerLine.trim().contains("/quit"))
 					{
 						printWriter.println("Received 'done' notification -- closing connection...");
-						System.out.println("User " + userID + " has ended the connection.");
+						ServerCore.theGUI.appendChat("User " + userID + " has ended the connection.");
 						
 						if(getServerConnection().isAuthenticated())
 						{
@@ -59,11 +59,11 @@ public class SocketConnection extends Thread
 						if(getServerConnection().isAuthenticated())
 						{
 							getServerConnection().user.addMessage(readerLine.trim());
-							System.out.println(getServerConnection().user.username + ": " + readerLine.trim());
+							ServerCore.theGUI.appendChat(getServerConnection().user.username + ": " + readerLine.trim());
 							ServerCore.distributeMessageIgnore(userID, getServerConnection().user.username + ": " + readerLine.trim());
 						}
 						else {
-							System.out.println("Guest: " + readerLine.trim());
+							ServerCore.theGUI.appendChat("Guest: " + readerLine.trim());
 							getServerConnection().tempMessages.add(readerLine.trim());
 							ServerCore.distributeMessageIgnore(userID, "Guest: " + readerLine.trim());
 						}
@@ -78,7 +78,7 @@ public class SocketConnection extends Thread
 			ServerCore.removeConnection(userID);
 
 			printWriter.println("Successfully closed connection!");
-			System.out.println("Closing connection with user '" + userID + ".'");
+			ServerCore.theGUI.appendChat("Closing connection with user '" + userID + ".'");
 			
 			bufferedReader.close();
 			printWriter.close();
@@ -89,7 +89,7 @@ public class SocketConnection extends Thread
 				System.err.println("Unable to close connection thread! Error: " + e.getMessage());
 			}
 		} catch(Throwable e) {
-			if(!e.getMessage().trim().toLowerCase().equals("socket closed"))
+			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("Socket is closed"))
 			{
 				System.err.println("Error: " + e.getMessage());
 				e.printStackTrace();
@@ -106,7 +106,7 @@ public class SocketConnection extends Thread
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
 			
 			printWriter.println("You have been kicked!");
-			System.out.println("Kicked user '" + userID + ".'");
+			ServerCore.theGUI.appendChat("Kicked user '" + userID + ".'");
 			
 			ServerCore.removeConnection(userID);
 			bufferedReader.close();
@@ -119,7 +119,7 @@ public class SocketConnection extends Thread
 				System.err.println("Unable to close connection thread! Error: " + e.getMessage());
 			}
 		} catch(IOException e) {
-			if(!e.getMessage().trim().toLowerCase().equals("socket closed"))
+			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("Socket is closed"))
 			{
 				System.err.println("Error: " + e.getMessage());
 				e.printStackTrace();
