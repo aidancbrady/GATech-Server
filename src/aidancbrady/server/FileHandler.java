@@ -39,7 +39,7 @@ public class FileHandler
 					}
 				}
 				
-				ServerCore.users.put(username, new User(username, messagesList));
+				ServerCore.instance().users.put(username, new User(username, messagesList));
 			}
 			
 			reader.close();
@@ -63,7 +63,7 @@ public class FileHandler
 			
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			
-			for(Map.Entry<String, User> entry : ServerCore.users.entrySet())
+			for(Map.Entry<String, User> entry : ServerCore.instance().users.entrySet())
 			{
 				StringBuilder builder = new StringBuilder(entry.getKey() + ":");
 				

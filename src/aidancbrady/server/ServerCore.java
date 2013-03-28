@@ -6,21 +6,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import javax.swing.JLabel;
-
 public final class ServerCore
 {
-	public static final int PORT = 3074;
-	public static boolean serverRunning = true;
-	public static boolean programRunning = true;
-	public static ServerSocket serverSocket;
-	public static Scanner scanner = new Scanner(System.in);
-	public static int usersConnected = 0;
-	public static Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
-	public static Map<String, User> users = new HashMap<String, User>();
-	public static ServerGUI theGUI;
+	private static ServerCore instance;
+	public final int PORT = 3074;
+	public boolean serverRunning = true;
+	public boolean programRunning = true;
+	public ServerSocket serverSocket;
+	public Scanner scanner = new Scanner(System.in);
+	public int usersConnected = 0;
+	public Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
+	public Map<String, User> users = new HashMap<String, User>();
+	public ServerGUI theGUI;
 	
 	public static void main(String[] args)
+	{
+		instance = new ServerCore();
+		instance.init();
+	}
+	
+	public void init()
 	{
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 		try {
@@ -31,7 +36,10 @@ public final class ServerCore
 			
 			theGUI = new ServerGUI();
 			
-			while(theGUI.isOpen) {}
+			synchronized(this)
+			{
+				wait();
+			}
 			
 			System.out.println("Shutting down...");
 			
@@ -49,25 +57,29 @@ public final class ServerCore
 			
 			FileHandler.write();
 			System.exit(0);
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
 	
-	public static int newConnection()
+	public static ServerCore instance()
+	{
+		return instance;
+	}
+	
+	public int newConnection()
 	{
 		return usersConnected++;
 	}
 	
-	public static void removeConnection(int userId)
+	public void removeConnection(int userId)
 	{
 		usersConnected--;
 		connections.remove(userId);
 	}
 	
-	public static void distributeMessageIgnore(int id, String message)
+	public void distributeMessageIgnore(int id, String message)
 	{
 		for(ServerConnection connection : connections.values())
 		{
@@ -85,7 +97,7 @@ public final class ServerCore
 		}
 	}
 	
-	public static void distributeMessage(String message)
+	public void distributeMessage(String message)
 	{
 		for(ServerConnection connection : connections.values())
 		{
@@ -107,9 +119,9 @@ class ShutdownHook extends Thread
 	public void run()
 	{
 		try {
-			if(ServerCore.serverSocket != null)
+			if(ServerCore.instance().serverSocket != null)
 			{
-				ServerCore.serverSocket.close();
+				ServerCore.instance().serverSocket.close();
 			}
 			
 			finalize();

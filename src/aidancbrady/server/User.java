@@ -11,7 +11,7 @@ public class User
 	{
 		username = name;
 		messages = message;
-		ServerCore.users.put(username, this);
+		ServerCore.instance().users.put(username, this);
 	}
 	
 	public void addMessage(String message)
@@ -25,7 +25,7 @@ public class User
 	
 	public boolean isOnline()
 	{
-		for(ServerConnection connection : ServerCore.connections.values())
+		for(ServerConnection connection : ServerCore.instance().connections.values())
 		{
 			if(connection.user != null)
 			{
@@ -43,7 +43,7 @@ public class User
 			return null;
 		}
 		
-		for(ServerConnection connection : ServerCore.connections.values())
+		for(ServerConnection connection : ServerCore.instance().connections.values())
 		{
 			if(connection.user != null)
 			{

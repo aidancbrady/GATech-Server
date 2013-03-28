@@ -5,12 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,9 +24,9 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 	
 	private JTextArea chat;
 	
-	private JList<JLabel> statistics;
+	private JList statistics;
 	
-	public JList<JLabel> usersList;
+	public JList usersList;
 	
 	private JTextField text;
 	
@@ -46,12 +43,10 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 			@Override
 			public void actionPerformed(ActionEvent event)
 			{
-				Vector<JLabel> vector = new Vector<JLabel>();
-				for(ServerConnection connection : ServerCore.connections.values())
+				Vector<String> vector = new Vector<String>();
+				for(ServerConnection connection : ServerCore.instance().connections.values())
 				{
-					JLabel label = new JLabel(connection.userID + ": " + (connection.isAuthenticated() ? connection.user.username : "Guest"));
-					label.setVisible(true);
-					vector.add(label);
+					vector.add(connection.userID + ": " + (connection.isAuthenticated() ? connection.user.username : "Guest"));
 				}
 				
 				usersList.setListData(vector);
@@ -68,12 +63,12 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 		
 		JPanel infoPanel = new JPanel(new BorderLayout());
 		
-		usersList = new JList<JLabel>();
+		usersList = new JList();
 		usersList.setBorder(new TitledBorder(new EtchedBorder(), "Online Users"));
 		usersList.setVisible(true);
 		infoPanel.add(new JScrollPane(usersList), "Center");
 		
-		statistics = new JList<JLabel>();
+		statistics = new JList();
 		statistics.setBorder(new TitledBorder(new EtchedBorder(), "Statistics"));
 		statistics.setVisible(true);
 		infoPanel.add(new JScrollPane(statistics), "South");
@@ -129,9 +124,9 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 			}
 			if(command.equals("stop"))
 			{
-				ServerCore.serverRunning = false;
+				ServerCore.instance().serverRunning = false;
 				
-				for(ServerConnection connection : ServerCore.connections.values())
+				for(ServerConnection connection : ServerCore.instance().connections.values())
 				{
 					connection.socketConnection.kick();
 				}
@@ -140,7 +135,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 			}
 			else if(command.equals("start"))
 			{
-				ServerCore.serverRunning = true;
+				ServerCore.instance().serverRunning = true;
 				appendChat("Start command received.");
 			}
 			else if(command.equals("quit"))
@@ -148,19 +143,19 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 				appendChat("Quit command received.");
 				appendChat("Shutting down...");
 				
-				ServerCore.distributeMessage("Server closing!");
+				ServerCore.instance().distributeMessage("Server closing!");
 				
-				for(ServerConnection connection : ServerCore.connections.values())
+				for(ServerConnection connection : ServerCore.instance().connections.values())
 				{
 					connection.socketConnection.socket.close();
 				}
 				
-				if(ServerCore.serverSocket != null)
+				if(ServerCore.instance().serverSocket != null)
 				{
-					ServerCore.serverSocket.close();
+					ServerCore.instance().serverSocket.close();
 				}
 				
-				ServerCore.connections.clear();
+				ServerCore.instance().connections.clear();
 				FileHandler.write();
 				appendChat("Goodbye!");
 				System.exit(0);
@@ -176,22 +171,22 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 						{
 							try {
 								int userID = Integer.parseInt(commandArgs[2]);
-								if(ServerCore.connections.get(userID) != null)
+								if(ServerCore.instance().connections.get(userID) != null)
 								{
 									appendChat("Information on user " + userID + ":");
-									appendChat("Username: " + (ServerCore.connections.get(userID).isAuthenticated() ? ServerCore.connections.get(userID).user.username : "unknown"));
-									if(ServerCore.connections.get(userID).user != null && !ServerCore.connections.get(userID).user.messages.isEmpty())
+									appendChat("Username: " + (ServerCore.instance().connections.get(userID).isAuthenticated() ? ServerCore.instance().connections.get(userID).user.username : "unknown"));
+									if(ServerCore.instance().connections.get(userID).user != null && !ServerCore.instance().connections.get(userID).user.messages.isEmpty())
 									{
 										appendChat("Logged messages:");
-										for(String message : ServerCore.connections.get(userID).user.messages)
+										for(String message : ServerCore.instance().connections.get(userID).user.messages)
 										{
 											appendChat(message);
 										}
 									}
-									else if(!ServerCore.connections.get(userID).isAuthenticated() && !ServerCore.connections.get(userID).tempMessages.isEmpty())
+									else if(!ServerCore.instance().connections.get(userID).isAuthenticated() && !ServerCore.instance().connections.get(userID).tempMessages.isEmpty())
 									{
 										appendChat("Logged messages:");
-										for(String message : ServerCore.connections.get(userID).tempMessages)
+										for(String message : ServerCore.instance().connections.get(userID).tempMessages)
 										{
 											appendChat(message);
 										}
@@ -216,14 +211,14 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 						if(commandArgs.length == 4 && commandArgs[2].equals("info") && !commandArgs[3].equals(""))
 						{
 							String name = commandArgs[3];
-							if(ServerCore.users.get(name) != null)
+							if(ServerCore.instance().users.get(name) != null)
 							{
 								appendChat("Information on user " + name + ":");
-								appendChat("Online: " + (ServerCore.users.get(name).isOnline() ? "Yes (ID: " + ServerCore.users.get(name).getConnection().userID + ")" : "No"));
-								if(!ServerCore.users.get(name).messages.isEmpty())
+								appendChat("Online: " + (ServerCore.instance().users.get(name).isOnline() ? "Yes (ID: " + ServerCore.instance().users.get(name).getConnection().userID + ")" : "No"));
+								if(!ServerCore.instance().users.get(name).messages.isEmpty())
 								{
 									appendChat("Logged messages:");
-									for(String message : ServerCore.users.get(name).messages)
+									for(String message : ServerCore.instance().users.get(name).messages)
 									{
 										appendChat(message);
 									}
@@ -239,25 +234,25 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 						else if(commandArgs.length == 3 && commandArgs[2].equals("list"))
 						{
 							appendChat("Cached users:");
-							for(User user : ServerCore.users.values())
+							for(User user : ServerCore.instance().users.values())
 							{
 								StringBuilder string = new StringBuilder();
 								string.append("User " + user.username + " " + (user.isOnline() ? "(Online)" : "(Offline)"));
 								appendChat(string.toString());
 							}
-							if(ServerCore.users.isEmpty())
+							if(ServerCore.instance().users.isEmpty())
 							{
 								appendChat("No users found in cache.");
 							}
 						}
 						else if(commandArgs.length == 4 && commandArgs[2].equals("remove") && !commandArgs[3].equals(""))
 						{
-							if(!ServerCore.users.containsKey(commandArgs[3]))
+							if(!ServerCore.instance().users.containsKey(commandArgs[3]))
 							{
 								System.err.println("User '" + commandArgs[3] + "' does not exist.");
 							}
 							else {
-								ServerCore.users.remove(commandArgs[3]);
+								ServerCore.instance().users.remove(commandArgs[3]);
 								FileHandler.write();
 								appendChat("Successfully removed user '" + commandArgs[3] + "' from cached map.");
 							}
@@ -276,9 +271,9 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 						{
 							try {
 								int userID = Integer.parseInt(commandArgs[2]);
-								if(ServerCore.connections.get(userID) != null)
+								if(ServerCore.instance().connections.get(userID) != null)
 								{
-									ServerCore.connections.get(userID).socketConnection.kick();
+									ServerCore.instance().connections.get(userID).socketConnection.kick();
 								}	
 								else {
 									System.err.println("Unable to find database for user '" + userID + ".'");
@@ -296,14 +291,14 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 						if(commandArgs.length == 2)
 						{
 							appendChat("Currently connected users:");
-							for(ServerConnection connection : ServerCore.connections.values())
+							for(ServerConnection connection : ServerCore.instance().connections.values())
 							{
 								StringBuilder string = new StringBuilder();
 								string.append("User " + connection.userID + " " + (connection.isAuthenticated() ? "(" + connection.user.username + ")" : "(no username found)"));
 								appendChat(string.toString());
 							}
 							
-							if(ServerCore.connections.isEmpty())
+							if(ServerCore.instance().connections.isEmpty())
 							{
 								appendChat("No users found on server.");
 							}
@@ -333,7 +328,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 			else if(command.startsWith("/"))
 			{
 				appendChat(command.substring(1));
-				ServerCore.distributeMessage(command.substring(1));
+				ServerCore.instance().distributeMessage(command.substring(1));
 			}
 			else {
 				appendChat("Unknown command.");
@@ -347,8 +342,13 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 	@Override
 	public void windowClosing(WindowEvent e)
 	{
-		isOpen = false;
 		timer.stop();
+		isOpen = false;
+		
+		synchronized(ServerCore.instance())
+		{
+			ServerCore.instance().notify();
+		}
 	}
 	
 	@Override

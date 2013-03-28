@@ -14,9 +14,9 @@ public class CommandDelete implements ICommand
 		if(connection.getServerConnection().isAuthenticated())
 		{
 			String username = connection.getServerConnection().user.username;
-			ServerCore.users.remove(username);
+			ServerCore.instance().users.remove(username);
 			printWriter.println("Successfully removed you from the cached user map. You are no longer authenticated.");
-			ServerCore.distributeMessageIgnore(connection.userID, "<" + username + " has left>");
+			ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + username + " has left>");
 			connection.getServerConnection().deauthenticate();
 			System.out.println("Successfully removed user '" + username + "' from cached map.");
 		}

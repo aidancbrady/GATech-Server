@@ -37,11 +37,11 @@ public class SocketConnection extends Thread
 					if(readerLine.trim().contains("/quit"))
 					{
 						printWriter.println("Received 'done' notification -- closing connection...");
-						ServerCore.theGUI.appendChat("User " + userID + " has ended the connection.");
+						ServerCore.instance().theGUI.appendChat("User " + userID + " has ended the connection.");
 						
 						if(getServerConnection().isAuthenticated())
 						{
-							ServerCore.distributeMessageIgnore(userID, "<" + getServerConnection().user.username + " has quit>");
+							ServerCore.instance().distributeMessageIgnore(userID, "<" + getServerConnection().user.username + " has quit>");
 						}
 						
 						doneReading = true;
@@ -59,13 +59,13 @@ public class SocketConnection extends Thread
 						if(getServerConnection().isAuthenticated())
 						{
 							getServerConnection().user.addMessage(readerLine.trim());
-							ServerCore.theGUI.appendChat(getServerConnection().user.username + ": " + readerLine.trim());
-							ServerCore.distributeMessageIgnore(userID, getServerConnection().user.username + ": " + readerLine.trim());
+							ServerCore.instance().theGUI.appendChat(getServerConnection().user.username + ": " + readerLine.trim());
+							ServerCore.instance().distributeMessageIgnore(userID, getServerConnection().user.username + ": " + readerLine.trim());
 						}
 						else {
-							ServerCore.theGUI.appendChat("Guest: " + readerLine.trim());
+							ServerCore.instance().theGUI.appendChat("Guest: " + readerLine.trim());
 							getServerConnection().tempMessages.add(readerLine.trim());
-							ServerCore.distributeMessageIgnore(userID, "Guest: " + readerLine.trim());
+							ServerCore.instance().distributeMessageIgnore(userID, "Guest: " + readerLine.trim());
 						}
 					}
 					continue;
@@ -75,10 +75,10 @@ public class SocketConnection extends Thread
 				}
 			}
 			
-			ServerCore.removeConnection(userID);
+			ServerCore.instance().removeConnection(userID);
 
 			printWriter.println("Successfully closed connection!");
-			ServerCore.theGUI.appendChat("Closing connection with user '" + userID + ".'");
+			ServerCore.instance().theGUI.appendChat("Closing connection with user '" + userID + ".'");
 			
 			bufferedReader.close();
 			printWriter.close();
@@ -106,9 +106,9 @@ public class SocketConnection extends Thread
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
 			
 			printWriter.println("You have been kicked!");
-			ServerCore.theGUI.appendChat("Kicked user '" + userID + ".'");
+			ServerCore.instance().theGUI.appendChat("Kicked user '" + userID + ".'");
 			
-			ServerCore.removeConnection(userID);
+			ServerCore.instance().removeConnection(userID);
 			bufferedReader.close();
 			printWriter.close();
 			socket.close();
@@ -141,6 +141,6 @@ public class SocketConnection extends Thread
 	
 	public ServerConnection getServerConnection()
 	{
-		return ServerCore.connections.get(userID);
+		return ServerCore.instance().connections.get(userID);
 	}
 }

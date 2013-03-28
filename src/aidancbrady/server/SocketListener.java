@@ -9,19 +9,19 @@ public class SocketListener extends Thread
 	public void run()
 	{
 		try {
-			ServerCore.serverSocket = new ServerSocket(ServerCore.PORT);
-			ServerCore.serverSocket.setReuseAddress(true);
+			ServerCore.instance().serverSocket = new ServerSocket(ServerCore.instance().PORT);
+			ServerCore.instance().serverSocket.setReuseAddress(true);
 			
-			while(ServerCore.serverRunning)
+			while(ServerCore.instance().serverRunning)
 			{
-				Socket connection = ServerCore.serverSocket.accept();
+				Socket connection = ServerCore.instance().serverSocket.accept();
 				
-				if(ServerCore.serverRunning)
+				if(ServerCore.instance().serverRunning)
 				{
-					ServerCore.theGUI.appendChat("Connection: " + connection.getInetAddress().toString() + ":" + connection.getPort());
+					ServerCore.instance().theGUI.appendChat("Connection: " + connection.getInetAddress().toString() + ":" + connection.getPort());
 					
-					SocketConnection socketConnection = new SocketConnection(ServerCore.newConnection(), connection);
-					ServerCore.connections.put(socketConnection.userID, new ServerConnection(socketConnection.userID, socketConnection));
+					SocketConnection socketConnection = new SocketConnection(ServerCore.instance().newConnection(), connection);
+					ServerCore.instance().connections.put(socketConnection.userID, new ServerConnection(socketConnection.userID, socketConnection));
 					
 					socketConnection.start();
 				}

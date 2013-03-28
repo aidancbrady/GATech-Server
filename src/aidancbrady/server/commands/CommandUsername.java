@@ -19,21 +19,21 @@ public class CommandUsername implements ICommand
 			
 			if(connection.getServerConnection().isAuthenticated())
 			{
-				if(ServerCore.users.get(params[1]) != null)
+				if(ServerCore.instance().users.get(params[1]) != null)
 				{
-					if(ServerCore.users.get(params[1]).isOnline())
+					if(ServerCore.instance().users.get(params[1]).isOnline())
 					{
 						printWriter.println("That username is already taken!");
 					}
 					else {
-						connection.getServerConnection().user = ServerCore.users.get(params[1]);
+						connection.getServerConnection().user = ServerCore.instance().users.get(params[1]);
 						printWriter.println("Successfully switched to user '" + params[1] + ".'");
-						ServerCore.distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + " has signed in as " + params[1] + ">");
+						ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + " has signed in as " + params[1] + ">");
 					}
 					return;
 				}
 				
-				ServerCore.distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + "'s username was changed to " + params[1] + ">");
+				ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + "'s username was changed to " + params[1] + ">");
 				connection.getServerConnection().user.username = params[1];
 				printWriter.println("Successfully changed username to " + params[1] + ".");
 				System.out.println("User " + connection.userID + " changed his username to '" + params[1] + ".'");

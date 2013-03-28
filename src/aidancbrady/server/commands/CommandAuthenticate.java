@@ -27,15 +27,15 @@ public class CommandAuthenticate implements ICommand
 				return;
 			}
 			
-			if(ServerCore.users.containsKey(params[1]))
+			if(ServerCore.instance().users.containsKey(params[1]))
 			{
-				if(ServerCore.users.get(params[1]).isOnline())
+				if(ServerCore.instance().users.get(params[1]).isOnline())
 				{
 					printWriter.println("That username is already taken!");
 					return;
 				}
 				
-				connection.getServerConnection().user = ServerCore.users.get(params[1]);
+				connection.getServerConnection().user = ServerCore.instance().users.get(params[1]);
 				
 				ArrayList<String> list = (ArrayList<String>)connection.getServerConnection().tempMessages.clone();
 				
@@ -48,7 +48,7 @@ public class CommandAuthenticate implements ICommand
 				
 				printWriter.println("Welcome back, " + params[1]);
 				System.out.println("User '" + params[1] + "' has joined.");
-				ServerCore.distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + " has joined>");
+				ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + " has joined>");
 			}
 			else {
 				ArrayList<String> newList = new ArrayList<String>(Arrays.asList(new String[connection.getServerConnection().tempMessages.size()]));
@@ -57,7 +57,7 @@ public class CommandAuthenticate implements ICommand
 				connection.getServerConnection().tempMessages.clear();
 				printWriter.println("Username received. Welcome to the AidanServer!");
 				System.out.println("User " + connection.userID + " sent username '" + params[1] + ".'");
-				ServerCore.distributeMessageIgnore(connection.userID, connection.getServerConnection().user.username + " has joined.");
+				ServerCore.instance().distributeMessageIgnore(connection.userID, connection.getServerConnection().user.username + " has joined.");
 			}
 		} catch(Exception e) {
 			printWriter.println("Invalid command usage.");
