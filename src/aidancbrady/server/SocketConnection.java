@@ -88,12 +88,12 @@ public class SocketConnection extends Thread
 			try {
 				finalize();
 			} catch (Throwable e) {
-				System.err.println("Unable to close connection thread! Error: " + e.getMessage());
+				ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + e.getMessage());
 			}
 		} catch(Throwable e) {
 			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("Socket is closed"))
 			{
-				System.err.println("Error: " + e.getMessage());
+				ServerCore.instance().theGUI.appendChat("Error: " + e.getMessage());
 				e.printStackTrace();
 			}
 			
@@ -118,12 +118,12 @@ public class SocketConnection extends Thread
 			try {
 				finalize();
 			} catch (Throwable e) {
-				System.err.println("Unable to close connection thread! Error: " + e.getMessage());
+				ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + e.getMessage());
 			}
 		} catch(IOException e) {
 			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("socket is closed"))
 			{
-				System.err.println("Error: " + e.getMessage());
+				ServerCore.instance().theGUI.appendChat("Error: " + e.getMessage());
 				e.printStackTrace();
 			}
 			
@@ -133,10 +133,10 @@ public class SocketConnection extends Thread
 				try {
 					finalize();
 				} catch (Throwable e1) {
-					System.err.println("Unable to close connection thread! Error: " + e1.getMessage());
+					ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + e1.getMessage());
 				}
 			} catch(IOException e1) {
-				System.err.println("Could not close connection! Error: " + e1.getMessage());
+				ServerCore.instance().theGUI.appendChat("Could not close connection! Error: " + e1.getMessage());
 			}
 		}
 	}

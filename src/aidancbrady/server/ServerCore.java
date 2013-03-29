@@ -76,7 +76,7 @@ public final class ServerCore
 	
 	public int newConnection()
 	{
-		return usersConnected++;
+		return ++usersConnected;
 	}
 	
 	public void removeConnection(int userId)
@@ -96,7 +96,7 @@ public final class ServerCore
 					printWriter.println(message);
 				} catch(Exception e) {
 					connection.socketConnection.kick();
-					System.err.println("An error occured while notifying other users.");
+					theGUI.appendChat("An error occured while notifying other users.");
 					e.printStackTrace();
 				}
 			}
@@ -112,7 +112,7 @@ public final class ServerCore
 				printWriter.println(message);
 			} catch(Exception e) {
 				connection.socketConnection.kick();
-				System.err.println("An error occured while notifying other users.");
+				theGUI.appendChat("An error occured while notifying other users.");
 				e.printStackTrace();
 			}
 		}

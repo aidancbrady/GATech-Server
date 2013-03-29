@@ -1,6 +1,8 @@
 package aidancbrady.server;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -38,7 +40,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 	{
 		super("Georgia Tech Chatserver");
 		
-		timer = new Timer(1000, new ActionListener()
+		timer = new Timer(100, new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent event)
@@ -47,6 +49,11 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 				for(ServerConnection connection : ServerCore.instance().connections.values())
 				{
 					userVector.add(connection.getUserID() + ": " + (connection.isAuthenticated() ? connection.user.username : "Guest"));
+				}
+				
+				if(userVector.isEmpty())
+				{
+					userVector.add("No users online.");
 				}
 				
 				usersList.setListData(userVector);
@@ -68,21 +75,32 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    } catch (Exception localException) {}
 		
-		JPanel UI = new JPanel(new BorderLayout());
+		JPanel completePanel = new JPanel(new BorderLayout());
 		
 		JPanel infoPanel = new JPanel(new BorderLayout());
+		
+		setBackground(Color.LIGHT_GRAY);
+		setResizable(false);
 		
 		usersList = new JList();
 		usersList.setBorder(new TitledBorder(new EtchedBorder(), "Online Users"));
 		usersList.setVisible(true);
+		usersList.setBackground(Color.GRAY);
+		usersList.setFocusable(false);
+		usersList.setPreferredSize(new Dimension(256-15, 286));
+		usersList.setToolTipText("The users currently connected to this server.");
 		infoPanel.add(new JScrollPane(usersList), "Center");
 		
 		statistics = new JList();
 		statistics.setBorder(new TitledBorder(new EtchedBorder(), "Statistics"));
 		statistics.setVisible(true);
+		statistics.setBackground(Color.GRAY);
+		statistics.setFocusable(false);
+		statistics.setPreferredSize(new Dimension(256-15, 164));
+		statistics.setToolTipText("Statistics regarding this server.");
 		infoPanel.add(new JScrollPane(statistics), "South");
 		
-		UI.add(infoPanel, "West");
+		completePanel.add(infoPanel, "West");
 		
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
@@ -90,6 +108,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 		chat.setEditable(false);
 		chat.setBorder(new TitledBorder(new EtchedBorder(), "Chatbox"));
 		chat.setAutoscrolls(true);
+		chat.setBackground(Color.LIGHT_GRAY);
 		mainPanel.add(new JScrollPane(chat), "Center");
 		
 		text = new JTextField();
@@ -98,11 +117,11 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 		text.setBorder(new TitledBorder(new EtchedBorder(), "Type here to Chat"));
 		mainPanel.add(text, "South");
 		
-		UI.add(mainPanel, "Center");
-		add(UI);
+		completePanel.add(mainPanel, "Center");
+		add(completePanel);
 		
 		addWindowListener(this);
-		setSize(854,480);
+		setSize(854, 480);
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}		
@@ -111,11 +130,6 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 	{	
 		chat.append(str+"\n");	
 		chat.setCaretPosition(chat.getText().length() - 1);
-	}
-	
-	public void removeUser(int userID)
-	{
-		usersList.remove(userID);
 	}
 
 	@Override
@@ -129,55 +143,91 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 			{
 				return;
 			}
-			if(command.equals("stop"))
+			
+			if(command.startsWith("/"))
 			{
-				ServerCore.instance().serverRunning = false;
-				
-				for(ServerConnection connection : ServerCore.instance().connections.values())
-				{
-					connection.socketConnection.kick();
-				}
-				
-				appendChat("Halting oncoming connections.");
-			}
-			else if(command.equals("start"))
-			{
-				ServerCore.instance().serverRunning = true;
-				new ScheduledTimer().start();
-				new SocketListener().start();
-				appendChat("Start command received.");
-			}
-			else if(command.equals("quit"))
-			{
-				windowClosing(null);
-			}
-			else if(command.startsWith("user"))
-			{
+				command = command.substring(1);
 				String[] commandArgs = command.split(" ");
-				if(commandArgs.length > 1)
+				if(command.equals("stop"))
 				{
-					if(commandArgs[1].equals("info"))
+					ServerCore.instance().serverRunning = false;
+					
+					for(ServerConnection connection : ServerCore.instance().connections.values())
 					{
-						if(commandArgs.length == 3)
+						connection.socketConnection.kick();
+					}
+					
+					appendChat("Halting oncoming connections.");
+				}
+				else if(command.equals("start"))
+				{
+					ServerCore.instance().serverRunning = true;
+					new ScheduledTimer().start();
+					new SocketListener().start();
+					appendChat("Start command received.");
+				}
+				else if(command.equals("quit"))
+				{
+					windowClosing(null);
+				}
+				else if(command.startsWith("user"))
+				{
+					if(commandArgs.length > 1)
+					{
+						if(commandArgs[1].equals("info"))
 						{
-							try {
-								int userID = Integer.parseInt(commandArgs[2]);
-								if(ServerCore.instance().connections.get(userID) != null)
-								{
-									appendChat("Information on user " + userID + ":");
-									appendChat("Username: " + (ServerCore.instance().connections.get(userID).isAuthenticated() ? ServerCore.instance().connections.get(userID).user.username : "unknown"));
-									if(ServerCore.instance().connections.get(userID).user != null && !ServerCore.instance().connections.get(userID).user.messages.isEmpty())
+							if(commandArgs.length == 3)
+							{
+								try {
+									int userID = Integer.parseInt(commandArgs[2]);
+									if(ServerCore.instance().connections.get(userID) != null)
 									{
-										appendChat("Logged messages:");
-										for(String message : ServerCore.instance().connections.get(userID).user.messages)
+										appendChat("Information on user " + userID + ":");
+										appendChat("Username: " + (ServerCore.instance().connections.get(userID).isAuthenticated() ? ServerCore.instance().connections.get(userID).user.username : "unknown"));
+										if(ServerCore.instance().connections.get(userID).user != null && !ServerCore.instance().connections.get(userID).user.messages.isEmpty())
 										{
-											appendChat(message);
+											appendChat("Logged messages:");
+											for(String message : ServerCore.instance().connections.get(userID).user.messages)
+											{
+												appendChat(message);
+											}
 										}
+										else if(!ServerCore.instance().connections.get(userID).isAuthenticated() && !ServerCore.instance().connections.get(userID).tempMessages.isEmpty())
+										{
+											appendChat("Logged messages:");
+											for(String message : ServerCore.instance().connections.get(userID).tempMessages)
+											{
+												appendChat(message);
+											}
+										}
+										else {
+											appendChat("No messages found for this user.");
+										}
+									}	
+									else {
+										System.err.println("Unable to find database for user '" + userID + ".'");
 									}
-									else if(!ServerCore.instance().connections.get(userID).isAuthenticated() && !ServerCore.instance().connections.get(userID).tempMessages.isEmpty())
+								} catch(NumberFormatException e1) {
+									System.err.println("Invalid characters.");
+								}
+							}
+							else {
+								appendChat("Usage: 'user info <ID>'");
+							}
+						}
+						else if(commandArgs[1].equals("cache"))
+						{
+							if(commandArgs.length == 4 && commandArgs[2].equals("info") && !commandArgs[3].equals(""))
+							{
+								String name = commandArgs[3];
+								if(ServerCore.instance().users.get(name) != null)
+								{
+									appendChat("Information on user " + name + ":");
+									appendChat("Online: " + (ServerCore.instance().users.get(name).isOnline() ? "Yes (ID: " + ServerCore.instance().users.get(name).getConnection().getUserID() + ")" : "No"));
+									if(!ServerCore.instance().users.get(name).messages.isEmpty())
 									{
 										appendChat("Logged messages:");
-										for(String message : ServerCore.instance().connections.get(userID).tempMessages)
+										for(String message : ServerCore.instance().users.get(name).messages)
 										{
 											appendChat(message);
 										}
@@ -185,144 +235,112 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 									else {
 										appendChat("No messages found for this user.");
 									}
-								}	
-								else {
-									System.err.println("Unable to find database for user '" + userID + ".'");
 								}
-							} catch(NumberFormatException e1) {
-								System.err.println("Invalid characters.");
+								else {
+									System.err.println("No cache found for user '" + name + ".'");
+								}
+							}
+							else if(commandArgs.length == 3 && commandArgs[2].equals("list"))
+							{
+								appendChat("Cached users:");
+								for(User user : ServerCore.instance().users.values())
+								{
+									StringBuilder string = new StringBuilder();
+									string.append("User " + user.username + " " + (user.isOnline() ? "(Online)" : "(Offline)"));
+									appendChat(string.toString());
+								}
+								if(ServerCore.instance().users.isEmpty())
+								{
+									appendChat("No users found in cache.");
+								}
+							}
+							else if(commandArgs.length == 4 && commandArgs[2].equals("remove") && !commandArgs[3].equals(""))
+							{
+								if(!ServerCore.instance().users.containsKey(commandArgs[3]))
+								{
+									System.err.println("User '" + commandArgs[3] + "' does not exist.");
+								}
+								else {
+									ServerCore.instance().users.remove(commandArgs[3]);
+									FileHandler.write();
+									appendChat("Successfully removed user '" + commandArgs[3] + "' from cached map.");
+								}
+							}
+							else {
+								appendChat("-- Cache Control Panel --");
+								appendChat("Command help:");
+								appendChat("'user cache info <username>' - gets and returns info from a user's cache.");
+								appendChat("'user cache remove <username>' - removes user's cache.");
+								appendChat("'user cache list' - lists out all the caches.");
 							}
 						}
-						else {
-							appendChat("Usage: 'user info <ID>'");
-						}
-					}
-					else if(commandArgs[1].equals("cache"))
-					{
-						if(commandArgs.length == 4 && commandArgs[2].equals("info") && !commandArgs[3].equals(""))
+						else if(commandArgs[1].equals("kick"))
 						{
-							String name = commandArgs[3];
-							if(ServerCore.instance().users.get(name) != null)
+							if(commandArgs.length == 3)
 							{
-								appendChat("Information on user " + name + ":");
-								appendChat("Online: " + (ServerCore.instance().users.get(name).isOnline() ? "Yes (ID: " + ServerCore.instance().users.get(name).getConnection().getUserID() + ")" : "No"));
-								if(!ServerCore.instance().users.get(name).messages.isEmpty())
-								{
-									appendChat("Logged messages:");
-									for(String message : ServerCore.instance().users.get(name).messages)
+								try {
+									int userID = Integer.parseInt(commandArgs[2]);
+									if(ServerCore.instance().connections.get(userID) != null)
 									{
-										appendChat(message);
+										ServerCore.instance().connections.get(userID).socketConnection.kick();
+									}	
+									else {
+										System.err.println("Unable to find database for user '" + userID + ".'");
 									}
-								}
-								else {
-									appendChat("No messages found for this user.");
+								} catch(NumberFormatException e1) {
+									System.err.println("Invalid characters.");
 								}
 							}
 							else {
-								System.err.println("No cache found for user '" + name + ".'");
+								appendChat("Usage: 'user kick <ID>'");
 							}
 						}
-						else if(commandArgs.length == 3 && commandArgs[2].equals("list"))
+						else if(commandArgs[1].equals("list"))
 						{
-							appendChat("Cached users:");
-							for(User user : ServerCore.instance().users.values())
+							if(commandArgs.length == 2)
 							{
-								StringBuilder string = new StringBuilder();
-								string.append("User " + user.username + " " + (user.isOnline() ? "(Online)" : "(Offline)"));
-								appendChat(string.toString());
-							}
-							if(ServerCore.instance().users.isEmpty())
-							{
-								appendChat("No users found in cache.");
-							}
-						}
-						else if(commandArgs.length == 4 && commandArgs[2].equals("remove") && !commandArgs[3].equals(""))
-						{
-							if(!ServerCore.instance().users.containsKey(commandArgs[3]))
-							{
-								System.err.println("User '" + commandArgs[3] + "' does not exist.");
-							}
-							else {
-								ServerCore.instance().users.remove(commandArgs[3]);
-								FileHandler.write();
-								appendChat("Successfully removed user '" + commandArgs[3] + "' from cached map.");
-							}
-						}
-						else {
-							appendChat("-- Cache Control Panel --");
-							appendChat("Command help:");
-							appendChat("'user cache info <username>' - gets and returns info from a user's cache.");
-							appendChat("'user cache remove <username>' - removes user's cache.");
-							appendChat("'user cache list' - lists out all the caches.");
-						}
-					}
-					else if(commandArgs[1].equals("kick"))
-					{
-						if(commandArgs.length == 3)
-						{
-							try {
-								int userID = Integer.parseInt(commandArgs[2]);
-								if(ServerCore.instance().connections.get(userID) != null)
+								appendChat("Currently connected users:");
+								for(ServerConnection connection : ServerCore.instance().connections.values())
 								{
-									ServerCore.instance().connections.get(userID).socketConnection.kick();
-								}	
-								else {
-									System.err.println("Unable to find database for user '" + userID + ".'");
+									StringBuilder string = new StringBuilder();
+									string.append("User " + connection.getUserID() + " " + (connection.isAuthenticated() ? "(" + connection.user.username + ")" : "(no username found)"));
+									appendChat(string.toString());
 								}
-							} catch(NumberFormatException e1) {
-								System.err.println("Invalid characters.");
+								
+								if(ServerCore.instance().connections.isEmpty())
+								{
+									appendChat("No users found on server.");
+								}
 							}
-						}
-						else {
-							appendChat("Usage: 'user kick <ID>'");
+							else {
+								appendChat("Usage: 'user list'");
+							}
 						}
 					}
-					else if(commandArgs[1].equals("list"))
-					{
-						if(commandArgs.length == 2)
-						{
-							appendChat("Currently connected users:");
-							for(ServerConnection connection : ServerCore.instance().connections.values())
-							{
-								StringBuilder string = new StringBuilder();
-								string.append("User " + connection.getUserID() + " " + (connection.isAuthenticated() ? "(" + connection.user.username + ")" : "(no username found)"));
-								appendChat(string.toString());
-							}
-							
-							if(ServerCore.instance().connections.isEmpty())
-							{
-								appendChat("No users found on server.");
-							}
-						}
-						else {
-							appendChat("Usage: 'user list'");
-						}
+					else {
+						appendChat("-- User Control Panel --");
+						appendChat("Command help:");
+						appendChat("'user info <ID>' - displays a user's information.");
+						appendChat("'user kick <ID>' - kicks a user from the server.");
+						appendChat("'user list' - lists all currently connected users.");
+						appendChat("'user cache <params>' - cache control panel.");
 					}
+				}
+				else if(command.equals("help"))
+				{
+					appendChat("-- Server Control Panel --");
+					appendChat("Command help:");
+					appendChat("'stop' - stops the server if it is running.");
+					appendChat("'quit' - stops the server if it is running and terminates the program.");
+					appendChat("'user <params>' - user control panel.");
 				}
 				else {
-					appendChat("-- User Control Panel --");
-					appendChat("Command help:");
-					appendChat("'user info <ID>' - displays a user's information.");
-					appendChat("'user kick <ID>' - kicks a user from the server.");
-					appendChat("'user list' - lists all currently connected users.");
-					appendChat("'user cache <params>' - cache control panel.");
+					appendChat("Unknown command.");
 				}
 			}
-			else if(command.equals("help"))
-			{
-				appendChat("-- Server Control Panel --");
-				appendChat("Command help:");
-				appendChat("'stop' - stops the server if it is running.");
-				appendChat("'quit' - stops the server if it is running and terminates the program.");
-				appendChat("'user <params>' - user control panel.");
-			}
-			else if(command.startsWith("/"))
-			{
-				appendChat(command.substring(1));
-				ServerCore.instance().distributeMessage(command.substring(1));
-			}
 			else {
-				appendChat("Unknown command.");
+				appendChat("Console: " + command);
+				ServerCore.instance().distributeMessage("Console: " + command);
 			}
 		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
