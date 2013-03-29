@@ -18,7 +18,7 @@ public class CommandDelete implements ICommand
 			printWriter.println("Successfully removed you from the cached user map. You are no longer authenticated.");
 			ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + username + " has left>");
 			connection.getServerConnection().deauthenticate();
-			System.out.println("Successfully removed user '" + username + "' from cached map.");
+			ServerCore.instance().theGUI.appendChat("Successfully removed user '" + username + "' from cached map.");
 		}
 		else {
 			printWriter.println("Please authenticate before deleting your cache.");

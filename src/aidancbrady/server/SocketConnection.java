@@ -22,6 +22,7 @@ public class SocketConnection extends Thread
 	public void run()
 	{
 		try {
+			
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
 			
@@ -32,6 +33,7 @@ public class SocketConnection extends Thread
 			
 			while((readerLine = bufferedReader.readLine()) != null && !doneReading)
 			{
+				getServerConnection().timeout = 0;
 				if(readerLine.trim().startsWith("/"))
 				{
 					if(readerLine.trim().contains("/quit"))
@@ -119,7 +121,7 @@ public class SocketConnection extends Thread
 				System.err.println("Unable to close connection thread! Error: " + e.getMessage());
 			}
 		} catch(IOException e) {
-			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("Socket is closed"))
+			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("socket is closed"))
 			{
 				System.err.println("Error: " + e.getMessage());
 				e.printStackTrace();

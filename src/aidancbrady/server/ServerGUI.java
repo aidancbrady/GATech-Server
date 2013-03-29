@@ -36,20 +36,29 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 	
 	public ServerGUI()
 	{
-		super("Aidan's and Dhruval's Chatserver");
+		super("Georgia Tech Chatserver");
 		
 		timer = new Timer(1000, new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent event)
 			{
-				Vector<String> vector = new Vector<String>();
+				Vector<String> userVector = new Vector<String>();
 				for(ServerConnection connection : ServerCore.instance().connections.values())
 				{
-					vector.add(connection.userID + ": " + (connection.isAuthenticated() ? connection.user.username : "Guest"));
+					userVector.add(connection.getUserID() + ": " + (connection.isAuthenticated() ? connection.user.username : "Guest"));
 				}
 				
-				usersList.setListData(vector);
+				usersList.setListData(userVector);
+				
+				Vector<String> statsVector = new Vector<String>();
+				statsVector.add("Online count: " + ServerCore.instance().connections.size());
+				statsVector.add("Cache count: " + ServerCore.instance().users.size());
+				statsVector.add("Active threads: " + Thread.activeCount());
+				statsVector.add("Active memory: " + (int)((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000000) + "MB");
+				statsVector.add("Total memory: " + (int)(Runtime.getRuntime().totalMemory()/1000000) + "MB");
+				
+				statistics.setListData(statsVector);
 			}
 		});
 		
@@ -98,8 +107,6 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}		
 
-	// append message to the two JTextArea
-	// position at the end
 	public void appendChat(String str) 
 	{	
 		chat.append(str+"\n");	
@@ -136,29 +143,13 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 			else if(command.equals("start"))
 			{
 				ServerCore.instance().serverRunning = true;
+				new ScheduledTimer().start();
+				new SocketListener().start();
 				appendChat("Start command received.");
 			}
 			else if(command.equals("quit"))
 			{
-				appendChat("Quit command received.");
-				appendChat("Shutting down...");
-				
-				ServerCore.instance().distributeMessage("Server closing!");
-				
-				for(ServerConnection connection : ServerCore.instance().connections.values())
-				{
-					connection.socketConnection.socket.close();
-				}
-				
-				if(ServerCore.instance().serverSocket != null)
-				{
-					ServerCore.instance().serverSocket.close();
-				}
-				
-				ServerCore.instance().connections.clear();
-				FileHandler.write();
-				appendChat("Goodbye!");
-				System.exit(0);
+				windowClosing(null);
 			}
 			else if(command.startsWith("user"))
 			{
@@ -214,7 +205,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 							if(ServerCore.instance().users.get(name) != null)
 							{
 								appendChat("Information on user " + name + ":");
-								appendChat("Online: " + (ServerCore.instance().users.get(name).isOnline() ? "Yes (ID: " + ServerCore.instance().users.get(name).getConnection().userID + ")" : "No"));
+								appendChat("Online: " + (ServerCore.instance().users.get(name).isOnline() ? "Yes (ID: " + ServerCore.instance().users.get(name).getConnection().getUserID() + ")" : "No"));
 								if(!ServerCore.instance().users.get(name).messages.isEmpty())
 								{
 									appendChat("Logged messages:");
@@ -294,7 +285,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 							for(ServerConnection connection : ServerCore.instance().connections.values())
 							{
 								StringBuilder string = new StringBuilder();
-								string.append("User " + connection.userID + " " + (connection.isAuthenticated() ? "(" + connection.user.username + ")" : "(no username found)"));
+								string.append("User " + connection.getUserID() + " " + (connection.isAuthenticated() ? "(" + connection.user.username + ")" : "(no username found)"));
 								appendChat(string.toString());
 							}
 							

@@ -6,18 +6,22 @@ public class ServerConnection
 {
 	public User user;
 	public SocketConnection socketConnection;
-	public int userID;
 	public ArrayList<String> tempMessages = new ArrayList<String>();
+	public int timeout = 0;
 	
-	public ServerConnection(int id, SocketConnection socket)
+	public ServerConnection(SocketConnection socket)
 	{
-		userID = id;
 		socketConnection = socket;
 	}
 	
 	public void deauthenticate()
 	{
 		user = null;
+	}
+	
+	public int getUserID()
+	{
+		return socketConnection.userID;
 	}
 	
 	public boolean isAuthenticated()

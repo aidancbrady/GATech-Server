@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Timer;
 
 public final class ServerCore
 {
@@ -18,6 +19,8 @@ public final class ServerCore
 	public Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
 	public Map<String, User> users = new HashMap<String, User>();
 	public ServerGUI theGUI;
+	public Timer timer;
+	public long TIMEOUT = 300000;
 	
 	public static void main(String[] args)
 	{
@@ -30,6 +33,8 @@ public final class ServerCore
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 		try {
 			FileHandler.read();
+			
+			new ScheduledTimer().start();
 			new SocketListener().start();
 			
 			System.out.println("Listening on port " + PORT);
@@ -43,19 +48,20 @@ public final class ServerCore
 			
 			System.out.println("Shutting down...");
 			
-			if(serverSocket != null)
-			{
-				serverSocket.close();
-			}
-			
 			for(ServerConnection connection : connections.values())
 			{
 				connection.socketConnection.socket.close();
 			}
 			
+			if(serverSocket != null)
+			{
+				serverSocket.close();
+			}
+			
 			connections.clear();
 			
 			FileHandler.write();
+			System.out.println("Goodbye!");
 			System.exit(0);
 		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
@@ -83,7 +89,7 @@ public final class ServerCore
 	{
 		for(ServerConnection connection : connections.values())
 		{
-			if(connection.userID != id)
+			if(connection.getUserID() != id)
 			{
 				try {
 					PrintWriter printWriter = new PrintWriter(connection.socketConnection.socket.getOutputStream(), true);
