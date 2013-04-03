@@ -266,6 +266,13 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 									appendChat("Successfully removed user '" + commandArgs[3] + "' from cached map.");
 								}
 							}
+							else if(commandArgs.length == 3 && commandArgs[2].equals("empty"))
+							{
+								int toRemove = ServerCore.instance().users.size();
+								ServerCore.instance().users.clear();
+								FileHandler.write();
+								appendChat("Removed " + toRemove + " users from cache.");
+							}
 							else {
 								appendChat("-- Cache Control Panel --");
 								appendChat("Command help:");
