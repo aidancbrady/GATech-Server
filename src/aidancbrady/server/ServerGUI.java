@@ -5,10 +5,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Vector;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -16,9 +20,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class ServerGUI extends JFrame implements ActionListener, WindowListener
 {
@@ -45,6 +52,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 			@Override
 			public void actionPerformed(ActionEvent event)
 			{
+				int index = usersList.getSelectedIndex();
 				Vector<String> userVector = new Vector<String>();
 				for(ServerConnection connection : ServerCore.instance().connections.values())
 				{
@@ -57,6 +65,12 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 				}
 				
 				usersList.setListData(userVector);
+				usersList.setSelectedIndex(index);
+				
+				if(userVector.size() == 1)
+				{
+					usersList.setSelectedIndex(0);
+				}
 				
 				Vector<String> statsVector = new Vector<String>();
 				statsVector.add("Online count: " + ServerCore.instance().connections.size());
@@ -83,15 +97,45 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 		setResizable(false);
 		
 		usersList = new JList();
+		
+		usersList.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent event)
+			{
+				if(event.getClickCount() == 2)
+				{
+					if(!((String)usersList.getSelectedValue()).equals("No users online."))
+					{
+						int id = Integer.parseInt(((String)usersList.getSelectedValue()).split(":")[0]);
+						ServerConnection connection = ServerCore.instance().connections.get(id);
+						
+						if(connection != null)
+						{
+							new ClientInfoGUI(connection);
+						}
+					}
+				}
+			}
+		});
+		usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		usersList.setBorder(new TitledBorder(new EtchedBorder(), "Online Users"));
 		usersList.setVisible(true);
+		usersList.setFocusable(true);
+		usersList.setEnabled(true);
+		usersList.setSelectionInterval(1, 1);
 		usersList.setBackground(Color.GRAY);
-		usersList.setFocusable(false);
 		usersList.setPreferredSize(new Dimension(256-15, 286));
 		usersList.setToolTipText("The users currently connected to this server.");
 		infoPanel.add(new JScrollPane(usersList), "Center");
 		
 		statistics = new JList();
+		
+		for(MouseListener listener : statistics.getMouseListeners())
+		{
+			statistics.removeMouseListener(listener);
+		}
+		
 		statistics.setBorder(new TitledBorder(new EtchedBorder(), "Statistics"));
 		statistics.setVisible(true);
 		statistics.setBackground(Color.GRAY);
@@ -112,6 +156,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 		mainPanel.add(new JScrollPane(chat), "Center");
 		
 		text = new JTextField();
+		text.setFocusable(true);
 		text.setText("");
 		text.addActionListener(this);
 		text.setBorder(new TitledBorder(new EtchedBorder(), "Type here to Chat"));
