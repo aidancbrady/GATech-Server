@@ -12,7 +12,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Vector;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -24,8 +23,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 public class ServerGUI extends JFrame implements ActionListener, WindowListener
 {
@@ -324,6 +321,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 								appendChat("'user cache info <username>' - gets and returns info from a user's cache.");
 								appendChat("'user cache remove <username>' - removes user's cache.");
 								appendChat("'user cache list' - lists out all the caches.");
+								appendChat("'user cache empty' - empties the server cache list.");
 							}
 						}
 						else if(commandArgs[1].equals("kick"))
@@ -377,6 +375,11 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 						appendChat("'user list' - lists all currently connected users.");
 						appendChat("'user cache <params>' - cache control panel.");
 					}
+				}
+				else if(command.equals("clear"))
+				{
+					chat.setText("Chat cleared.");
+					appendChat("");
 				}
 				else if(command.equals("help"))
 				{

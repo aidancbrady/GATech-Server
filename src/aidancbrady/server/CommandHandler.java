@@ -6,7 +6,7 @@ import aidancbrady.server.commands.CommandAuthenticate;
 import aidancbrady.server.commands.CommandDeauthenticate;
 import aidancbrady.server.commands.CommandDelete;
 import aidancbrady.server.commands.CommandHelp;
-import aidancbrady.server.commands.CommandInfo;
+import aidancbrady.server.commands.CommandWhois;
 import aidancbrady.server.commands.CommandUsername;
 
 public class CommandHandler 
@@ -32,10 +32,10 @@ public class CommandHandler
 	
 	public static enum CommandType
 	{
-		USERNAME("user", " /user <username> - change your username", new CommandUsername()),
+		USERNAME("username", " /username <username> - change your username", new CommandUsername()),
 		AUTHENTICATE("auth", " /auth - authenticate in network", new CommandAuthenticate()),
 		DEAUTHENTICATE("deauth", " /deauth - deauthenticate from network", new CommandDeauthenticate()),
-		INFO("info", " /info <id> - get information on a user ID", new CommandInfo()),
+		WHOIS("whois", " /whois <id> - get information on a user ID", new CommandWhois()),
 		DELETE("delete", " /delete - delete your profile", new CommandDelete()),
 		HELP("help", " /help - view this page", new CommandHelp()),
 		UNKNOWN("null", "null", null);

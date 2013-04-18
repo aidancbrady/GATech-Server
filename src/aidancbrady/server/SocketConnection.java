@@ -87,7 +87,7 @@ public class SocketConnection extends Thread
 			socket.close();
 			try {
 				finalize();
-			} catch (Throwable e) {
+			} catch(Throwable e) {
 				ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + e.getMessage());
 			}
 		} catch(Throwable e) {
@@ -98,6 +98,10 @@ public class SocketConnection extends Thread
 			}
 			
 			kick();
+			
+			try {
+				finalize();
+			} catch(Throwable e1) {}
 		}
 	}
 	

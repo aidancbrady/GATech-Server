@@ -25,7 +25,6 @@ public class CommandDeauthenticate implements ICommand
 			}
 		} catch(Exception e) {
 			printWriter.println("Invalid command usage.");
-			e.printStackTrace();
 		}
 	}
 }
