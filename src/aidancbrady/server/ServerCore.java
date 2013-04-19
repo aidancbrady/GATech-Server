@@ -1,26 +1,27 @@
 package aidancbrady.server;
 
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.Timer;
 
-public final class ServerCore
+public class ServerCore
 {
 	private static ServerCore instance;
+	
 	public final int PORT = 3074;
+	public final long TIMEOUT = 300000;
+	
 	public boolean serverRunning = true;
 	public boolean programRunning = true;
+	
 	public ServerSocket serverSocket;
-	public Scanner scanner = new Scanner(System.in);
+	
 	public int usersConnected = 0;
+	
 	public Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
 	public Map<String, User> users = new HashMap<String, User>();
+	
 	public ServerGUI theGUI;
-	public Timer timer;
-	public long TIMEOUT = 300000;
 	
 	public static void main(String[] args)
 	{
@@ -28,6 +29,9 @@ public final class ServerCore
 		instance.init();
 	}
 	
+	/**
+	 * Initiates the server.
+	 */
 	public void init()
 	{
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
@@ -69,22 +73,63 @@ public final class ServerCore
 		}
 	}
 	
+	/**
+	 * Gets the primary ServerCore instance.
+	 * @return ServerCore instance
+	 */
 	public static ServerCore instance()
 	{
 		return instance;
 	}
 	
+	/**
+	 * Increments the usersConnected and returns a new ID for the newly-connected user.
+	 * @return new user ID
+	 */
 	public int newConnection()
 	{
-		return ++usersConnected;
+		usersConnected++;
+		
+		int idToUse = 0;
+		
+		while(true)
+		{
+			boolean hasThisLoop = false;
+			idToUse++;
+			
+			for(ServerConnection connection : connections.values())
+			{
+				if(connection.getUserID() == idToUse)
+				{
+					hasThisLoop = true;
+					break;
+				}
+			}
+			
+			if(hasThisLoop)
+			{
+				continue;
+			}
+			
+			return idToUse;
+		}
 	}
 	
+	/**
+	 * Decrements the usersConnected and removes the connection associated with the defined user ID from the server.
+	 * @param userId
+	 */
 	public void removeConnection(int userId)
 	{
 		usersConnected--;
 		connections.remove(userId);
 	}
 	
+	/**
+	 * Distributes a message to all connected users other than the one with the specified ID.
+	 * @param id - user ID to ignore
+	 * @param message - message to send
+	 */
 	public void distributeMessageIgnore(int id, String message)
 	{
 		for(ServerConnection connection : connections.values())
@@ -92,8 +137,7 @@ public final class ServerCore
 			if(connection.getUserID() != id)
 			{
 				try {
-					PrintWriter printWriter = new PrintWriter(connection.socketConnection.socket.getOutputStream(), true);
-					printWriter.println(message);
+					connection.socketConnection.printWriter.println(message);
 				} catch(Exception e) {
 					connection.socketConnection.kick();
 					theGUI.appendChat("An error occured while notifying other users.");
@@ -103,13 +147,16 @@ public final class ServerCore
 		}
 	}
 	
+	/**
+	 * Distributes a message to all connected users.
+	 * @param message - message to send
+	 */
 	public void distributeMessage(String message)
 	{
 		for(ServerConnection connection : connections.values())
 		{
 			try {
-				PrintWriter printWriter = new PrintWriter(connection.socketConnection.socket.getOutputStream(), true);
-				printWriter.println(message);
+				connection.socketConnection.printWriter.println(message);
 			} catch(Exception e) {
 				connection.socketConnection.kick();
 				theGUI.appendChat("An error occured while notifying other users.");

@@ -1,16 +1,21 @@
 package aidancbrady.server;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-
 public class SocketConnection extends Thread
 {
 	public Socket socket;
+	
+	public BufferedReader bufferedReader;
+	
+	public PrintWriter printWriter;
+	
 	public int userID;
+	
+	public boolean kicking = false;
 	
 	public SocketConnection(int id, Socket accept)
 	{
@@ -22,9 +27,8 @@ public class SocketConnection extends Thread
 	public void run()
 	{
 		try {
-			
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+			bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			printWriter = new PrintWriter(socket.getOutputStream(), true);
 			
 			printWriter.println("Please identify yourself with a username.");
 			
@@ -38,7 +42,7 @@ public class SocketConnection extends Thread
 				{
 					if(readerLine.trim().contains("/quit"))
 					{
-						printWriter.println("Received 'done' notification -- closing connection...");
+						printWriter.println(" -- Disconnecting -- ");
 						ServerCore.instance().theGUI.appendChat("User " + userID + " has ended the connection.");
 						
 						if(getServerConnection().isAuthenticated())
@@ -70,7 +74,6 @@ public class SocketConnection extends Thread
 							ServerCore.instance().distributeMessageIgnore(userID, "Guest: " + readerLine.trim());
 						}
 					}
-					continue;
 				} catch(Exception e) {
 					printWriter.println("Invalid message.");
 					e.printStackTrace();
@@ -85,37 +88,39 @@ public class SocketConnection extends Thread
 			bufferedReader.close();
 			printWriter.close();
 			socket.close();
+			
 			try {
 				finalize();
-			} catch(Throwable e) {
-				ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + e.getMessage());
+			} catch(Throwable t) {
+				ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + t.getMessage());
 			}
-		} catch(Throwable e) {
-			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("Socket is closed"))
+		} catch(Throwable t) {
+			if(!t.getMessage().trim().toLowerCase().equals("socket closed") && !t.getMessage().trim().toLowerCase().equals("Socket is closed"))
 			{
-				ServerCore.instance().theGUI.appendChat("Error: " + e.getMessage());
-				e.printStackTrace();
+				ServerCore.instance().theGUI.appendChat("Error: " + t.getMessage());
+				t.printStackTrace();
 			}
 			
-			kick();
+			if(!kicking)
+			{
+				kick();
+			}
 			
 			try {
 				finalize();
-			} catch(Throwable e1) {}
+			} catch(Throwable t1) {}
 		}
 	}
 	
 	public void kick()
 	{
+		kicking = true;
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-			
 			printWriter.println("You have been kicked!");
-			ServerCore.instance().theGUI.appendChat("Kicked user '" + userID + ".'");
 			
+			ServerCore.instance().theGUI.appendChat("Kicked user '" + userID + ".'");
 			ServerCore.instance().removeConnection(userID);
-			bufferedReader.close();
+			
 			printWriter.close();
 			socket.close();
 			
@@ -124,23 +129,11 @@ public class SocketConnection extends Thread
 			} catch (Throwable e) {
 				ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + e.getMessage());
 			}
-		} catch(IOException e) {
+		} catch(Exception e) {
 			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("socket is closed"))
 			{
 				ServerCore.instance().theGUI.appendChat("Error: " + e.getMessage());
 				e.printStackTrace();
-			}
-			
-			try {
-				socket.close();
-				
-				try {
-					finalize();
-				} catch (Throwable e1) {
-					ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + e1.getMessage());
-				}
-			} catch(IOException e1) {
-				ServerCore.instance().theGUI.appendChat("Could not close connection! Error: " + e1.getMessage());
 			}
 		}
 	}

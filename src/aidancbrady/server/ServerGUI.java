@@ -28,13 +28,13 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 {
 	private static final long serialVersionUID = 1L;
 	
-	private JTextArea chat;
+	private JTextArea chatBox;
 	
 	private JList statistics;
 	
 	public JList usersList;
 	
-	private JTextField text;
+	private JTextField chatField;
 	
 	public boolean isOpen = true;
 	
@@ -145,19 +145,19 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 		
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
-		chat = new JTextArea();
-		chat.setEditable(false);
-		chat.setBorder(new TitledBorder(new EtchedBorder(), "Chatbox"));
-		chat.setAutoscrolls(true);
-		chat.setBackground(Color.LIGHT_GRAY);
-		mainPanel.add(new JScrollPane(chat), "Center");
+		chatBox = new JTextArea();
+		chatBox.setEditable(false);
+		chatBox.setBorder(new TitledBorder(new EtchedBorder(), "Chatbox"));
+		chatBox.setAutoscrolls(true);
+		chatBox.setBackground(Color.LIGHT_GRAY);
+		mainPanel.add(new JScrollPane(chatBox), "Center");
 		
-		text = new JTextField();
-		text.setFocusable(true);
-		text.setText("");
-		text.addActionListener(this);
-		text.setBorder(new TitledBorder(new EtchedBorder(), "Type here to Chat"));
-		mainPanel.add(text, "South");
+		chatField = new JTextField();
+		chatField.setFocusable(true);
+		chatField.setText("");
+		chatField.addActionListener(this);
+		chatField.setBorder(new TitledBorder(new EtchedBorder(), "Type here to Chat"));
+		mainPanel.add(chatField, "South");
 		
 		completePanel.add(mainPanel, "Center");
 		add(completePanel);
@@ -170,15 +170,15 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 
 	public void appendChat(String str) 
 	{	
-		chat.append(str+"\n");	
-		chat.setCaretPosition(chat.getText().length() - 1);
+		chatBox.append(str+"\n");	
+		chatBox.setCaretPosition(chatBox.getText().length() - 1);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) 
 	{
 		try {
-			text.setText("");
+			chatField.setText("");
 			String command = arg0.getActionCommand().trim().toLowerCase();
 			
 			if(command == null || command.equals(""))
@@ -247,10 +247,10 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 										}
 									}	
 									else {
-										System.err.println("Unable to find database for user '" + userID + ".'");
+										appendChat("Unable to find database for user '" + userID + ".'");
 									}
 								} catch(NumberFormatException e1) {
-									System.err.println("Invalid characters.");
+									appendChat("Invalid characters.");
 								}
 							}
 							else {
@@ -279,7 +279,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 									}
 								}
 								else {
-									System.err.println("No cache found for user '" + name + ".'");
+									appendChat("No cache found for user '" + name + ".'");
 								}
 							}
 							else if(commandArgs.length == 3 && commandArgs[2].equals("list"))
@@ -300,7 +300,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 							{
 								if(!ServerCore.instance().users.containsKey(commandArgs[3]))
 								{
-									System.err.println("User '" + commandArgs[3] + "' does not exist.");
+									appendChat("User '" + commandArgs[3] + "' does not exist.");
 								}
 								else {
 									ServerCore.instance().users.remove(commandArgs[3]);
@@ -335,10 +335,10 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 										ServerCore.instance().connections.get(userID).socketConnection.kick();
 									}	
 									else {
-										System.err.println("Unable to find database for user '" + userID + ".'");
+										appendChat("Unable to find database for user '" + userID + ".'");
 									}
 								} catch(NumberFormatException e1) {
-									System.err.println("Invalid characters.");
+									appendChat("Invalid characters.");
 								}
 							}
 							else {
@@ -378,7 +378,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 				}
 				else if(command.equals("clear"))
 				{
-					chat.setText("Chat cleared.");
+					chatBox.setText("Chat cleared.");
 					appendChat("");
 				}
 				else if(command.equals("help"))
@@ -398,7 +398,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 				ServerCore.instance().distributeMessage("Console: " + command);
 			}
 		} catch (Exception e) {
-			System.err.println("Error: " + e.getMessage());
+			appendChat("Error: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
