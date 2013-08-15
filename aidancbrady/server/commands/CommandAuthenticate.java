@@ -9,6 +9,7 @@ import aidancbrady.server.ICommand;
 import aidancbrady.server.ServerCore;
 import aidancbrady.server.SocketConnection;
 import aidancbrady.server.User;
+import aidancbrady.server.Util;
 
 public class CommandAuthenticate implements ICommand
 {
@@ -37,7 +38,7 @@ public class CommandAuthenticate implements ICommand
 				
 				connection.getServerConnection().user = ServerCore.instance().users.get(params[1]);
 				
-				ArrayList<String> list = (ArrayList<String>)connection.getServerConnection().tempMessages.clone();
+				ArrayList<String> list = Util.genericClone(connection.getServerConnection().tempMessages);
 				
 				for(String s : list)
 				{
@@ -53,7 +54,7 @@ public class CommandAuthenticate implements ICommand
 			else {
 				ArrayList<String> newList = new ArrayList<String>(Arrays.asList(new String[connection.getServerConnection().tempMessages.size()]));
 				Collections.copy(newList, connection.getServerConnection().tempMessages);
-				connection.getServerConnection().user = new User(params[1], (ArrayList<String>)connection.getServerConnection().tempMessages.clone());
+				connection.getServerConnection().user = new User(params[1], Util.genericClone(connection.getServerConnection().tempMessages));
 				connection.getServerConnection().tempMessages.clear();
 				printWriter.println("Username received. Welcome to the AidanServer!");
 				ServerCore.instance().theGUI.appendChat("User " + connection.userID + " sent username '" + params[1] + ".'");

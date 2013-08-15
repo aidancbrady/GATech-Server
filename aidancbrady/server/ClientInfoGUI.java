@@ -26,7 +26,7 @@ public class ClientInfoGUI extends JFrame implements ActionListener, WindowListe
 	
 	private Timer timer;
 	
-	public JList messageList;
+	public JList<String> messageList;
 	
 	public JLabel usernameLabel;
 	
@@ -60,7 +60,7 @@ public class ClientInfoGUI extends JFrame implements ActionListener, WindowListe
 			usernameLabel.setVisible(false);
 		}
 		
-		messageList = new JList();
+		messageList = new JList<String>();
 		JScrollPane scroll = new JScrollPane(messageList);
 		scroll.setAlignmentX(Component.CENTER_ALIGNMENT);
 		scroll.setPreferredSize(new Dimension(200, 300));

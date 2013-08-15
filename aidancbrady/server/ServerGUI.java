@@ -30,9 +30,9 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 	
 	private JTextArea chatBox;
 	
-	private JList statistics;
+	private JList<String> statistics;
 	
-	public JList usersList;
+	public JList<String> usersList;
 	
 	private JTextField chatField;
 	
@@ -93,7 +93,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 		setBackground(Color.LIGHT_GRAY);
 		setResizable(false);
 		
-		usersList = new JList();
+		usersList = new JList<String>();
 		
 		usersList.addMouseListener(new MouseAdapter()
 		{
@@ -126,7 +126,7 @@ public class ServerGUI extends JFrame implements ActionListener, WindowListener
 		usersList.setToolTipText("The users currently connected to this server.");
 		infoPanel.add(new JScrollPane(usersList), "Center");
 		
-		statistics = new JList();
+		statistics = new JList<String>();
 		
 		for(MouseListener listener : statistics.getMouseListeners())
 		{
