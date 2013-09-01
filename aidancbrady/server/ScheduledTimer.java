@@ -11,7 +11,7 @@ public class ScheduledTimer extends Thread
 			{
 				if(++connection.timeout >= ServerCore.instance().TIMEOUT)
 				{
-					ServerCore.instance().theGUI.appendChat("User " + connection.getUserID() + " has timed out.");
+					ServerCore.instance().theGui.appendChat("User " + connection.getUserID() + " has timed out.");
 					connection.socketConnection.kick();
 				}
 			}

@@ -36,7 +36,7 @@ public class CommandUsername implements ICommand
 				ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + "'s username was changed to " + params[1] + ">");
 				connection.getServerConnection().user.username = params[1];
 				printWriter.println("Successfully changed username to " + params[1] + ".");
-				ServerCore.instance().theGUI.appendChat("User " + connection.userID + " changed his username to '" + params[1] + ".'");
+				ServerCore.instance().theGui.appendChat("User " + connection.userID + " changed his username to '" + params[1] + ".'");
 			}
 			else {
 				printWriter.println("Please authenticate before you modify your username.");

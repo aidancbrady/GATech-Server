@@ -43,7 +43,7 @@ public class SocketConnection extends Thread
 					if(readerLine.trim().contains("/quit"))
 					{
 						printWriter.println(" -- Disconnecting -- ");
-						ServerCore.instance().theGUI.appendChat("User " + userID + " has ended the connection.");
+						ServerCore.instance().theGui.appendChat("User " + userID + " has ended the connection.");
 						
 						if(getServerConnection().isAuthenticated())
 						{
@@ -65,11 +65,11 @@ public class SocketConnection extends Thread
 						if(getServerConnection().isAuthenticated())
 						{
 							getServerConnection().user.addMessage(readerLine.trim());
-							ServerCore.instance().theGUI.appendChat(getServerConnection().user.username + ": " + readerLine.trim());
+							ServerCore.instance().theGui.appendChat(getServerConnection().user.username + ": " + readerLine.trim());
 							ServerCore.instance().distributeMessageIgnore(userID, getServerConnection().user.username + ": " + readerLine.trim());
 						}
 						else {
-							ServerCore.instance().theGUI.appendChat("Guest: " + readerLine.trim());
+							ServerCore.instance().theGui.appendChat("Guest: " + readerLine.trim());
 							getServerConnection().tempMessages.add(readerLine.trim());
 							ServerCore.instance().distributeMessageIgnore(userID, "Guest: " + readerLine.trim());
 						}
@@ -83,7 +83,7 @@ public class SocketConnection extends Thread
 			ServerCore.instance().removeConnection(userID);
 
 			printWriter.println("Successfully closed connection!");
-			ServerCore.instance().theGUI.appendChat("Closing connection with user '" + userID + ".'");
+			ServerCore.instance().theGui.appendChat("Closing connection with user '" + userID + ".'");
 			
 			bufferedReader.close();
 			printWriter.close();
@@ -92,12 +92,12 @@ public class SocketConnection extends Thread
 			try {
 				finalize();
 			} catch(Throwable t) {
-				ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + t.getMessage());
+				ServerCore.instance().theGui.appendChat("Unable to close connection thread! Error: " + t.getMessage());
 			}
 		} catch(Throwable t) {
 			if(!t.getMessage().trim().toLowerCase().equals("socket closed") && !t.getMessage().trim().toLowerCase().equals("Socket is closed"))
 			{
-				ServerCore.instance().theGUI.appendChat("Error: " + t.getMessage());
+				ServerCore.instance().theGui.appendChat("Error: " + t.getMessage());
 				t.printStackTrace();
 			}
 			
@@ -118,7 +118,7 @@ public class SocketConnection extends Thread
 		try {
 			printWriter.println("You have been kicked!");
 			
-			ServerCore.instance().theGUI.appendChat("Kicked user '" + userID + ".'");
+			ServerCore.instance().theGui.appendChat("Kicked user '" + userID + ".'");
 			ServerCore.instance().removeConnection(userID);
 			
 			printWriter.close();
@@ -127,12 +127,12 @@ public class SocketConnection extends Thread
 			try {
 				finalize();
 			} catch (Throwable e) {
-				ServerCore.instance().theGUI.appendChat("Unable to close connection thread! Error: " + e.getMessage());
+				ServerCore.instance().theGui.appendChat("Unable to close connection thread! Error: " + e.getMessage());
 			}
 		} catch(Exception e) {
 			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("socket is closed"))
 			{
-				ServerCore.instance().theGUI.appendChat("Error: " + e.getMessage());
+				ServerCore.instance().theGui.appendChat("Error: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

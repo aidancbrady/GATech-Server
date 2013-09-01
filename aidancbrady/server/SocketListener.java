@@ -9,14 +9,13 @@ public class SocketListener extends Thread
 	public void run()
 	{
 		try {
-			ServerCore.instance().serverSocket = new ServerSocket(ServerCore.instance().PORT);
-			
 			while(ServerCore.instance().serverRunning)
 			{
 				Socket connection = ServerCore.instance().serverSocket.accept();
+				
 				if(ServerCore.instance().serverRunning)
 				{
-					ServerCore.instance().theGUI.appendChat("Connection: " + connection.getInetAddress().toString() + ":" + connection.getPort());
+					ServerCore.instance().theGui.appendChat("Connection: " + connection.getInetAddress().toString() + ":" + connection.getPort());
 					
 					SocketConnection socketConnection = new SocketConnection(ServerCore.instance().newConnection(), connection);
 					ServerCore.instance().connections.put(socketConnection.userID, new ServerConnection(socketConnection));

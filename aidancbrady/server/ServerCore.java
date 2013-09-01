@@ -8,10 +8,11 @@ public class ServerCore
 {
 	private static ServerCore instance;
 	
-	public final int PORT = 3074;
+	public int port = -1;
+	
 	public final long TIMEOUT = 300000;
 	
-	public boolean serverRunning = true;
+	public boolean serverRunning = false;
 	public boolean programRunning = true;
 	
 	public ServerSocket serverSocket;
@@ -21,7 +22,7 @@ public class ServerCore
 	public Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
 	public Map<String, User> users = new HashMap<String, User>();
 	
-	public ServerGUI theGUI;
+	public ServerGui theGui;
 	
 	public static void main(String[] args)
 	{
@@ -35,15 +36,13 @@ public class ServerCore
 	public void init()
 	{
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+		
 		try {
 			FileHandler.read();
 			
-			new ScheduledTimer().start();
-			new SocketListener().start();
+			System.out.println("Initializing...");
 			
-			System.out.println("Listening on port " + PORT);
-			
-			theGUI = new ServerGUI();
+			theGui = new ServerGui();
 			
 			synchronized(this)
 			{
@@ -140,7 +139,7 @@ public class ServerCore
 					connection.socketConnection.printWriter.println(message);
 				} catch(Exception e) {
 					connection.socketConnection.kick();
-					theGUI.appendChat("An error occured while notifying other users.");
+					theGui.appendChat("An error occured while notifying other users.");
 					e.printStackTrace();
 				}
 			}
@@ -159,10 +158,60 @@ public class ServerCore
 				connection.socketConnection.printWriter.println(message);
 			} catch(Exception e) {
 				connection.socketConnection.kick();
-				theGUI.appendChat("An error occured while notifying other users.");
+				theGui.appendChat("An error occured while notifying other users.");
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void start()
+	{
+		if(port == -1)
+		{
+			return;
+		}
+		
+		serverRunning = true;
+		
+		try {
+			serverSocket = new ServerSocket(port);
+			
+			new ScheduledTimer().start();
+			new SocketListener().start();
+			
+			System.out.println("Server initialized on port " + port);
+			
+			theGui.setPortButton.setEnabled(false);
+			theGui.portEntry.setEnabled(false);
+			theGui.startServerButton.setEnabled(false);
+			theGui.stopServerButton.setEnabled(true);
+		} catch(Exception e) {}
+	}
+	
+	public void stop()
+	{
+		ServerCore.instance().serverRunning = false;
+		
+		try {
+			for(ServerConnection connection : connections.values())
+			{
+				connection.socketConnection.socket.close();
+			}
+			
+			if(serverSocket != null)
+			{
+				serverSocket.close();
+			}
+			
+			System.out.println("Server deinitialized");
+			
+			theGui.setPortButton.setEnabled(true);
+			theGui.portEntry.setEnabled(true);
+			theGui.startServerButton.setEnabled(true);
+			theGui.stopServerButton.setEnabled(false);
+		} catch(Exception e) {}
+		
+		connections.clear();
 	}
 }
 
