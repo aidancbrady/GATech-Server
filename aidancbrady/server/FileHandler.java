@@ -33,6 +33,7 @@ public class FileHandler
 				if(lineSplit.length == 2 && lineSplit[1] != "")
 				{
 					String[] messagesSplit = lineSplit[1].split("/");
+					
 					for(String s : messagesSplit)
 					{
 						messagesList.add(s);
@@ -73,6 +74,7 @@ public class FileHandler
 				}
 				
 				String toWrite = builder.toString().trim();
+				
 				if(toWrite.charAt(toWrite.length()-1) == '/')
 				{
 					toWrite = toWrite.substring(0, toWrite.length()-1);

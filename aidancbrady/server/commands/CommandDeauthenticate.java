@@ -15,7 +15,6 @@ public class CommandDeauthenticate implements ICommand
 			if(connection.getServerConnection().isAuthenticated())
 			{
 				String username = connection.getServerConnection().user.username;
-				ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + username + " has left>");
 				connection.getServerConnection().deauthenticate();
 				ServerCore.instance().theGui.appendChat("User '" + username + "' has deauthenticated.");
 				printWriter.println("Successfully deauthenticated.");

@@ -37,6 +37,7 @@ public class ClientInfoGUI extends JFrame implements ActionListener, WindowListe
 	public ClientInfoGUI(ServerConnection conn)
 	{
 		super(conn.isAuthenticated() ? conn.user.username : "Guest");
+		
 		connection = conn;
 		setBackground(Color.LIGHT_GRAY);
 		setResizable(false);

@@ -411,6 +411,10 @@ public class ServerGui extends JFrame implements WindowListener
 										appendChat("User '" + commandArgs[3] + "' does not exist.");
 									}
 									else {
+										if(ServerCore.instance().users.get(commandArgs[3]).isOnline())
+										{
+											ServerCore.instance().users.get(commandArgs[3]).getConnection().deauthenticate();
+										}
 										ServerCore.instance().users.remove(commandArgs[3]);
 										FileHandler.write();
 										appendChat("Successfully removed user '" + commandArgs[3] + "' from cached map.");

@@ -16,6 +16,7 @@ public class ServerConnection
 	
 	public void deauthenticate()
 	{
+		ServerCore.instance().distributeMessage("<" + user.username + " has left>");
 		user = null;
 	}
 	
