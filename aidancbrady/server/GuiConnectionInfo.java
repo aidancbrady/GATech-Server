@@ -18,7 +18,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-public class GuiConnectionInfo extends JFrame implements ActionListener, WindowListener
+public class GuiConnectionInfo extends JFrame implements WindowListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -55,7 +55,20 @@ public class GuiConnectionInfo extends JFrame implements ActionListener, WindowL
 		
 		JButton button = new JButton("Kick");
 		button.setAlignmentX(Component.CENTER_ALIGNMENT);
-		button.addActionListener(this);
+		button.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				getConnection().socketConnection.kick();
+				timer.stop();
+				
+				try {
+					dispose();
+					setVisible(false);
+				} catch(Throwable t) {}
+			}
+		});
 		getContentPane().add(button);
 		
 		JButton clearButton = new JButton("Clear");
@@ -128,18 +141,6 @@ public class GuiConnectionInfo extends JFrame implements ActionListener, WindowL
 	public ServerConnection getConnection()
 	{
 		return ServerCore.instance().connections.get(userID);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent arg0) 
-	{
-		getConnection().socketConnection.kick();
-		timer.stop();
-		
-		try {
-			dispose();
-			setVisible(false);
-		} catch(Throwable t) {}
 	}
 	
 	@Override

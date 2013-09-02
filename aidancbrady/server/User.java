@@ -11,6 +11,7 @@ public class User
 	{
 		username = name;
 		messages = message;
+		
 		ServerCore.instance().cachedUsers.put(username, this);
 	}
 	
@@ -19,6 +20,7 @@ public class User
 		if(message != null)
 		{
 			messages.add(message);
+			
 			FileHandler.write();
 		}
 	}

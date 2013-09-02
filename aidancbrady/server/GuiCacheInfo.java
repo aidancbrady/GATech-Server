@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-public class GuiCacheInfo extends JFrame implements ActionListener, WindowListener
+public class GuiCacheInfo extends JFrame implements WindowListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -136,7 +136,19 @@ public class GuiCacheInfo extends JFrame implements ActionListener, WindowListen
 		leftButtons.add(clearButton);
 		
 		kickButton = new JButton("Kick");
-		kickButton.addActionListener(this);
+		kickButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				if(!getUser().isOnline())
+				{
+					return;
+				}
+				
+				getUser().getConnection().socketConnection.kick();
+			}
+		});
 		leftButtons.add(kickButton);
 		
 		buttonPanel.add(leftButtons, "West");
@@ -199,17 +211,6 @@ public class GuiCacheInfo extends JFrame implements ActionListener, WindowListen
 	public User getUser()
 	{
 		return ServerCore.instance().cachedUsers.get(username);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent arg0) 
-	{
-		if(!getUser().isOnline())
-		{
-			return;
-		}
-		
-		getUser().getConnection().socketConnection.kick();
 	}
 	
 	@Override

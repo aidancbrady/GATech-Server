@@ -26,8 +26,7 @@ public class ServerCore
 	
 	public static void main(String[] args)
 	{
-		instance = new ServerCore();
-		instance.init();
+		(instance = new ServerCore()).init();
 	}
 	
 	/**
@@ -66,7 +65,7 @@ public class ServerCore
 			FileHandler.write();
 			System.out.println("Goodbye!");
 			System.exit(0);
-		} catch (Exception e) {
+		} catch(Exception e) {
 			System.err.println("Error: " + e.getMessage());
 			e.printStackTrace();
 		}
