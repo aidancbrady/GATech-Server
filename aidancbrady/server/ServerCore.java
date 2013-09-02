@@ -1,8 +1,11 @@
 package aidancbrady.server;
 
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.JOptionPane;
 
 public class ServerCore
 {
@@ -170,10 +173,10 @@ public class ServerCore
 			return;
 		}
 		
-		serverRunning = true;
-		
 		try {
 			serverSocket = new ServerSocket(port);
+			
+			serverRunning = true;
 			
 			new ScheduledTimer().start();
 			new SocketListener().start();
@@ -186,6 +189,8 @@ public class ServerCore
 			theGui.portEntry.setEnabled(false);
 			theGui.startServerButton.setEnabled(false);
 			theGui.stopServerButton.setEnabled(true);
+		} catch(BindException e) {
+			JOptionPane.showMessageDialog(theGui, "Permission denied.", "Warning", JOptionPane.WARNING_MESSAGE);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
