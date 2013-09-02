@@ -62,7 +62,7 @@ public class GuiServer extends JFrame implements WindowListener
 	
 	public GuiServer()
 	{
-		super("Georgia Tech Chatserver");
+		super("DynamicServer (Server)");
 		
 		timer = new Timer(100, new ActionListener()
 		{

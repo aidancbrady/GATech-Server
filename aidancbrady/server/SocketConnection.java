@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class SocketConnection extends Thread
 {
@@ -38,6 +39,7 @@ public class SocketConnection extends Thread
 			while((readerLine = bufferedReader.readLine()) != null && !doneReading)
 			{
 				getServerConnection().timeout = 0;
+				
 				if(readerLine.trim().startsWith("/"))
 				{
 					if(readerLine.trim().contains("/quit"))
@@ -88,18 +90,12 @@ public class SocketConnection extends Thread
 			bufferedReader.close();
 			printWriter.close();
 			socket.close();
-			
-			try {
-				finalize();
-			} catch(Throwable t) {
-				ServerCore.instance().theGui.appendChat("Unable to close connection thread! Error: " + t.getMessage());
-			}
+		
+			finalize();
+		} catch(SocketException e) {
 		} catch(Throwable t) {
-			if(!t.getMessage().trim().toLowerCase().equals("socket closed") && !t.getMessage().trim().toLowerCase().equals("Socket is closed"))
-			{
-				ServerCore.instance().theGui.appendChat("Error: " + t.getMessage());
-				t.printStackTrace();
-			}
+			ServerCore.instance().theGui.appendChat("Error: " + t.getMessage());
+			t.printStackTrace();
 			
 			if(!kicking)
 			{

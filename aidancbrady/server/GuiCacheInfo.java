@@ -186,12 +186,10 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 				if(getUser().isOnline())
 				{
 					kickButton.setEnabled(true);
-					removeButton.setEnabled(true);
 					deauthButton.setEnabled(true);
 				}
 				else {
 					kickButton.setEnabled(false);
-					removeButton.setEnabled(false);
 					deauthButton.setEnabled(false);
 				}
 			}

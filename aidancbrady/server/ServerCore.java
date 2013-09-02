@@ -16,7 +16,6 @@ public class ServerCore
 	public final long TIMEOUT = 300000;
 	
 	public boolean serverRunning = false;
-	public boolean programRunning = true;
 	
 	public ServerSocket serverSocket;
 	
@@ -198,8 +197,6 @@ public class ServerCore
 	
 	public void stop()
 	{
-		ServerCore.instance().serverRunning = false;
-		
 		try {
 			for(ServerConnection connection : connections.values())
 			{
@@ -211,6 +208,8 @@ public class ServerCore
 				serverSocket.close();
 			}
 			
+			serverRunning = false;
+			
 			System.out.println("Server deinitialized");
 			
 			theGui.activeLabel.setText("Inactive -");
@@ -219,7 +218,9 @@ public class ServerCore
 			theGui.portEntry.setEnabled(true);
 			theGui.startServerButton.setEnabled(true);
 			theGui.stopServerButton.setEnabled(false);
-		} catch(Exception e) {}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		
 		connections.clear();
 	}
