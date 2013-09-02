@@ -1,6 +1,9 @@
 package aidancbrady.server;
 
+import java.awt.Font;
 import java.util.ArrayList;
+
+import javax.swing.JLabel;
 
 public final class Util
 {
@@ -14,5 +17,11 @@ public final class Util
 		}
 		
 		return toReturn;
+	}
+	
+	public static JLabel getWithFont(JLabel label, Font font)
+	{
+		label.setFont(font);
+		return label;
 	}
 }

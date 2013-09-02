@@ -3,6 +3,7 @@ package aidancbrady.server;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -34,9 +35,11 @@ public class ServerGui extends JFrame implements WindowListener
 	
 	private JList statistics;
 	
-	public JList usersList;
+	public JList onlineUsersList;
 	
-	public JPanel portSetter;
+	public JList offlineUsersList;
+	
+	public JPanel serverControlPanel;
 	
 	public JButton setPortButton;
 	
@@ -47,6 +50,8 @@ public class ServerGui extends JFrame implements WindowListener
 	public JTextField portEntry;
 	
 	public JLabel portLabel;
+	
+	public JLabel activeLabel;
 	
 	public JTextField chatField;
 	
@@ -63,8 +68,11 @@ public class ServerGui extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent event)
 			{
-				int index = usersList.getSelectedIndex();
+				int index = onlineUsersList.getSelectedIndex();
+				int offlineIndex = offlineUsersList.getSelectedIndex();
+				
 				Vector<String> userVector = new Vector<String>();
+				Vector<String> offlineVector = new Vector<String>();
 				
 				for(ServerConnection connection : ServerCore.instance().connections.values())
 				{
@@ -76,18 +84,39 @@ public class ServerGui extends JFrame implements WindowListener
 					userVector.add("No users online.");
 				}
 				
-				usersList.setListData(userVector);
-				usersList.setSelectedIndex(index);
+				onlineUsersList.setListData(userVector);
+				onlineUsersList.setSelectedIndex(index);
 				
 				if(userVector.size() == 1)
 				{
-					usersList.setSelectedIndex(0);
+					onlineUsersList.setSelectedIndex(0);
+				}
+				
+				for(User user : ServerCore.instance().cachedUsers.values())
+				{
+					if(!user.isOnline())
+					{
+						offlineVector.add(user.username);
+					}
+				}
+				
+				if(offlineVector.isEmpty())
+				{
+					offlineVector.add("No users cached.");
+				}
+				
+				offlineUsersList.setListData(offlineVector);
+				offlineUsersList.setSelectedIndex(offlineIndex);
+				
+				if(offlineVector.size() == 1)
+				{
+					offlineUsersList.setSelectedIndex(0);
 				}
 				
 				Vector<String> statsVector = new Vector<String>();
 				statsVector.add("Active: " + ServerCore.instance().serverRunning);
 				statsVector.add("Online count: " + ServerCore.instance().connections.size());
-				statsVector.add("Cache count: " + ServerCore.instance().users.size());
+				statsVector.add("Cache count: " + ServerCore.instance().cachedUsers.size());
 				statsVector.add("Active threads: " + Thread.activeCount());
 				statsVector.add("Active memory: " + (int)((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000000) + "MB");
 				statsVector.add("Total memory: " + (int)(Runtime.getRuntime().totalMemory()/1000000) + "MB");
@@ -105,72 +134,121 @@ public class ServerGui extends JFrame implements WindowListener
 		JPanel completePanel = new JPanel(new BorderLayout());
 		
 		JPanel rightInfoPanel = new JPanel(new BorderLayout());
+		rightInfoPanel.setPreferredSize(new Dimension(206, 800));
+		
 		JPanel leftInfoPanel = new JPanel(new BorderLayout());
+		leftInfoPanel.setPreferredSize(new Dimension(206, 800));
 		
 		setBackground(Color.LIGHT_GRAY);
 		setResizable(false);
 		
 		//Start user list panel
-		usersList = new JList();
+		onlineUsersList = new JList();
 		
-		usersList.addMouseListener(new MouseAdapter()
+		onlineUsersList.addMouseListener(new MouseAdapter()
 		{
 			@Override
 			public void mouseClicked(MouseEvent event)
 			{
 				if(event.getClickCount() == 2)
 				{
-					if(!((String)usersList.getSelectedValue()).equals("No users online."))
+					if(!((String)onlineUsersList.getSelectedValue()).equals("No users online."))
 					{
-						int id = Integer.parseInt(((String)usersList.getSelectedValue()).split(":")[0]);
+						int id = Integer.parseInt(((String)onlineUsersList.getSelectedValue()).split(":")[0]);
 						ServerConnection connection = ServerCore.instance().connections.get(id);
 						
 						if(connection != null)
 						{
-							new ClientInfoGUI(connection);
+							if(!connection.isAuthenticated())
+							{
+								new ConnectionInfoGUI(id);
+							}
+							else {
+								new CacheInfoGUI(connection.user.username);
+							}
 						}
 					}
 				}
 			}
 		});
 		
-		usersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		usersList.setBorder(new TitledBorder(new EtchedBorder(), "Online Users"));
-		usersList.setVisible(true);
-		usersList.setFocusable(true);
-		usersList.setEnabled(true);
-		usersList.setSelectionInterval(1, 1);
-		usersList.setBackground(Color.GRAY);
-		usersList.setPreferredSize(new Dimension(256-15, 286));
-		usersList.setToolTipText("The users currently connected to this server.");
-		leftInfoPanel.add(new JScrollPane(usersList), "Center");
+		onlineUsersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		onlineUsersList.setBorder(new TitledBorder(new EtchedBorder(), "Online Users"));
+		onlineUsersList.setVisible(true);
+		onlineUsersList.setFocusable(true);
+		onlineUsersList.setEnabled(true);
+		onlineUsersList.setSelectionInterval(1, 1);
+		onlineUsersList.setBackground(Color.GRAY);
+		onlineUsersList.setToolTipText("The users currently connected to this server.");
+		JScrollPane onlinePane = new JScrollPane(onlineUsersList);
+		onlinePane.setPreferredSize(new Dimension(256-15, 290));
+		leftInfoPanel.add(onlinePane, "North");
 		//End user list panel
 		
+		//Start offline user list panel
+		offlineUsersList = new JList();
+		
+		offlineUsersList.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent event)
+			{
+				if(event.getClickCount() == 2)
+				{
+					if(!((String)offlineUsersList.getSelectedValue()).equals("No users cached."))
+					{
+						User user = ServerCore.instance().cachedUsers.get((String)offlineUsersList.getSelectedValue());
+						
+						if(user != null)
+						{
+							new CacheInfoGUI(user.username);
+						}
+					}
+				}
+			}
+		});
+		
+		offlineUsersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		offlineUsersList.setBorder(new TitledBorder(new EtchedBorder(), "Cached Users"));
+		offlineUsersList.setVisible(true);
+		offlineUsersList.setFocusable(true);
+		offlineUsersList.setEnabled(true);
+		offlineUsersList.setSelectionInterval(1, 1);
+		offlineUsersList.setBackground(Color.GRAY);
+		offlineUsersList.setToolTipText("The users cached in this server's database.");
+		JScrollPane offlinePane = new JScrollPane(offlineUsersList);
+		offlinePane.setPreferredSize(new Dimension(256-15, 290));
+		leftInfoPanel.add(offlinePane);
+		//End offline user list panel
+		
 		//Start port setter panel
-		portSetter = new JPanel();
-		portSetter.setBorder(new TitledBorder(new EtchedBorder(), "Set Port"));
-		portSetter.setVisible(true);
-		portSetter.setBackground(Color.GRAY);
-		portSetter.setFocusable(false);
-		portSetter.setPreferredSize(new Dimension(206-15, 290));
-		portSetter.setToolTipText("Set this server's active port to a new value.");
+		serverControlPanel = new JPanel();
+		serverControlPanel.setBorder(new TitledBorder(new EtchedBorder(), "Server Control"));
+		serverControlPanel.setVisible(true);
+		serverControlPanel.setBackground(Color.GRAY);
+		serverControlPanel.setFocusable(false);
+		serverControlPanel.setPreferredSize(new Dimension(206-15, 290));
+		serverControlPanel.setToolTipText("Set this server's active port to a new value.");
+		
+		activeLabel = Util.getWithFont(new JLabel("Inactive -"), new Font("Arial", Font.BOLD, 14));
+		serverControlPanel.add(activeLabel);
 		
 		portLabel = new JLabel("N/A");
-		portSetter.add(portLabel, "North");
+		serverControlPanel.add(portLabel);
 		
 		portEntry = new JTextField();
 		portEntry.setFocusable(true);
 		portEntry.setText("");
 		portEntry.setPreferredSize(new Dimension(140, 20));
 		portEntry.addActionListener(new PortEntryListener());
-		portSetter.add(portEntry, "North");
+		serverControlPanel.add(portEntry, "North");
 		
 		setPortButton = new JButton("Confirm");
 		setPortButton.setFocusable(true);
-		setPortButton.setPreferredSize(new Dimension(100, 25));
+		setPortButton.setPreferredSize(new Dimension(120, 25));
 		setPortButton.addActionListener(new SetPortButtonListener());
 		
-		portSetter.add(setPortButton, "Center");
+		serverControlPanel.add(setPortButton, "Center");
 		
 		startServerButton = new JButton("Start");
 		startServerButton.setFocusable(true);
@@ -185,6 +263,8 @@ public class ServerGui extends JFrame implements WindowListener
 			}
 		});
 		
+		serverControlPanel.add(startServerButton, "South");
+		
 		stopServerButton = new JButton("Stop");
 		stopServerButton.setFocusable(true);
 		stopServerButton.setPreferredSize(new Dimension(80, 25));
@@ -197,11 +277,10 @@ public class ServerGui extends JFrame implements WindowListener
 				ServerCore.instance().stop();
 			}
 		});
+	
+		serverControlPanel.add(stopServerButton, "South");
 		
-		portSetter.add(startServerButton, "South");
-		portSetter.add(stopServerButton, "South");
-		
-		rightInfoPanel.add(portSetter, "North");
+		rightInfoPanel.add(serverControlPanel, "North");
 		//End port setter panel
 		
 		//Start statistics panel
@@ -218,7 +297,7 @@ public class ServerGui extends JFrame implements WindowListener
 		statistics.setFocusable(false);
 		statistics.setPreferredSize(new Dimension(206-15, 164));
 		statistics.setToolTipText("Statistics regarding this server.");
-		rightInfoPanel.add(new JScrollPane(statistics), "South");
+		rightInfoPanel.add(new JScrollPane(statistics));
 		//End statistics panel
 		
 		completePanel.add(rightInfoPanel, "West");
@@ -235,20 +314,33 @@ public class ServerGui extends JFrame implements WindowListener
 		mainPanel.add(new JScrollPane(chatBox), "Center");
 		//End chat box panel
 		
+		JPanel chatEntryPanel = new JPanel(new BorderLayout());
+		chatEntryPanel.setBackground(Color.WHITE);
+		
 		//Start chat field panel
 		chatField = new JTextField();
 		chatField.setFocusable(true);
 		chatField.setText("");
+		chatField.setPreferredSize(new Dimension(120, 40));
 		chatField.addActionListener(new ChatBoxListener());
 		chatField.setBorder(new TitledBorder(new EtchedBorder(), "Type here to Chat"));
-		mainPanel.add(chatField, "South");
+		chatEntryPanel.add(chatField, "Center");
 		//End chat field panel
+		
+		JButton clearChatButton = new JButton("Clear");
+		clearChatButton.setVisible(true);
+		clearChatButton.setBackground(Color.WHITE);
+		clearChatButton.setFocusable(true);
+		clearChatButton.setPreferredSize(new Dimension(80, 40));
+		chatEntryPanel.add(clearChatButton, "East");
+		
+		mainPanel.add(chatEntryPanel, "South");
 		
 		completePanel.add(mainPanel, "Center");
 		add(completePanel);
 		
 		addWindowListener(this);
-		setSize(854, 480);
+		setSize(854, 580);
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}		
@@ -267,10 +359,12 @@ public class ServerGui extends JFrame implements WindowListener
 			if(!ServerCore.instance().serverRunning)
 			{
 				String command = portEntry.getText().trim().toLowerCase();
-				portEntry.setText("");
 				
-				ServerCore.instance().port = Integer.parseInt(command);
-				portLabel.setText("" + ServerCore.instance().port);
+				try {
+					ServerCore.instance().port = Integer.parseInt(command);
+					portLabel.setText("" + ServerCore.instance().port);
+					portEntry.setText("");
+				} catch(Exception e) {}
 			}
 			else {
 				
@@ -286,10 +380,12 @@ public class ServerGui extends JFrame implements WindowListener
 			if(!ServerCore.instance().serverRunning)
 			{
 				String command = portEntry.getText().trim().toLowerCase();
-				portEntry.setText("");
 				
-				ServerCore.instance().port = Integer.parseInt(command);
-				portLabel.setText("" + ServerCore.instance().port);
+				try {
+					ServerCore.instance().port = Integer.parseInt(command);
+					portLabel.setText("" + ServerCore.instance().port);
+					portEntry.setText("");
+				} catch(Exception e) {}
 			}
 			else {
 				
@@ -324,106 +420,12 @@ public class ServerGui extends JFrame implements WindowListener
 					{
 						if(commandArgs.length > 1)
 						{
-							if(commandArgs[1].equals("info"))
+							if(commandArgs[1].equals("cache"))
 							{
-								if(commandArgs.length == 3)
+								if(commandArgs.length == 3 && commandArgs[2].equals("empty"))
 								{
-									try {
-										int userID = Integer.parseInt(commandArgs[2]);
-										if(ServerCore.instance().connections.get(userID) != null)
-										{
-											appendChat("Information on user " + userID + ":");
-											appendChat("Username: " + (ServerCore.instance().connections.get(userID).isAuthenticated() ? ServerCore.instance().connections.get(userID).user.username : "unknown"));
-											if(ServerCore.instance().connections.get(userID).user != null && !ServerCore.instance().connections.get(userID).user.messages.isEmpty())
-											{
-												appendChat("Logged messages:");
-												for(String message : ServerCore.instance().connections.get(userID).user.messages)
-												{
-													appendChat(message);
-												}
-											}
-											else if(!ServerCore.instance().connections.get(userID).isAuthenticated() && !ServerCore.instance().connections.get(userID).tempMessages.isEmpty())
-											{
-												appendChat("Logged messages:");
-												for(String message : ServerCore.instance().connections.get(userID).tempMessages)
-												{
-													appendChat(message);
-												}
-											}
-											else {
-												appendChat("No messages found for this user.");
-											}
-										}	
-										else {
-											appendChat("Unable to find database for user '" + userID + ".'");
-										}
-									} catch(NumberFormatException e1) {
-										appendChat("Invalid characters.");
-									}
-								}
-								else {
-									appendChat("Usage: 'user info <ID>'");
-								}
-							}
-							else if(commandArgs[1].equals("cache"))
-							{
-								if(commandArgs.length == 4 && commandArgs[2].equals("info") && !commandArgs[3].equals(""))
-								{
-									String name = commandArgs[3];
-									if(ServerCore.instance().users.get(name) != null)
-									{
-										appendChat("Information on user " + name + ":");
-										appendChat("Online: " + (ServerCore.instance().users.get(name).isOnline() ? "Yes (ID: " + ServerCore.instance().users.get(name).getConnection().getUserID() + ")" : "No"));
-										if(!ServerCore.instance().users.get(name).messages.isEmpty())
-										{
-											appendChat("Logged messages:");
-											for(String message : ServerCore.instance().users.get(name).messages)
-											{
-												appendChat(message);
-											}
-										}
-										else {
-											appendChat("No messages found for this user.");
-										}
-									}
-									else {
-										appendChat("No cache found for user '" + name + ".'");
-									}
-								}
-								else if(commandArgs.length == 3 && commandArgs[2].equals("list"))
-								{
-									appendChat("Cached users:");
-									for(User user : ServerCore.instance().users.values())
-									{
-										StringBuilder string = new StringBuilder();
-										string.append("User " + user.username + " " + (user.isOnline() ? "(Online)" : "(Offline)"));
-										appendChat(string.toString());
-									}
-									if(ServerCore.instance().users.isEmpty())
-									{
-										appendChat("No users found in cache.");
-									}
-								}
-								else if(commandArgs.length == 4 && commandArgs[2].equals("remove") && !commandArgs[3].equals(""))
-								{
-									if(!ServerCore.instance().users.containsKey(commandArgs[3]))
-									{
-										appendChat("User '" + commandArgs[3] + "' does not exist.");
-									}
-									else {
-										if(ServerCore.instance().users.get(commandArgs[3]).isOnline())
-										{
-											ServerCore.instance().users.get(commandArgs[3]).getConnection().deauthenticate();
-										}
-										ServerCore.instance().users.remove(commandArgs[3]);
-										FileHandler.write();
-										appendChat("Successfully removed user '" + commandArgs[3] + "' from cached map.");
-									}
-								}
-								else if(commandArgs.length == 3 && commandArgs[2].equals("empty"))
-								{
-									int toRemove = ServerCore.instance().users.size();
-									ServerCore.instance().users.clear();
+									int toRemove = ServerCore.instance().cachedUsers.size();
+									ServerCore.instance().cachedUsers.clear();
 									FileHandler.write();
 									appendChat("Removed " + toRemove + " users from cache.");
 								}
@@ -434,48 +436,6 @@ public class ServerGui extends JFrame implements WindowListener
 									appendChat("'user cache remove <username>' - removes user's cache.");
 									appendChat("'user cache list' - lists out all the caches.");
 									appendChat("'user cache empty' - empties the server cache list.");
-								}
-							}
-							else if(commandArgs[1].equals("kick"))
-							{
-								if(commandArgs.length == 3)
-								{
-									try {
-										int userID = Integer.parseInt(commandArgs[2]);
-										if(ServerCore.instance().connections.get(userID) != null)
-										{
-											ServerCore.instance().connections.get(userID).socketConnection.kick();
-										}	
-										else {
-											appendChat("Unable to find database for user '" + userID + ".'");
-										}
-									} catch(NumberFormatException e1) {
-										appendChat("Invalid characters.");
-									}
-								}
-								else {
-									appendChat("Usage: 'user kick <ID>'");
-								}
-							}
-							else if(commandArgs[1].equals("list"))
-							{
-								if(commandArgs.length == 2)
-								{
-									appendChat("Currently connected users:");
-									for(ServerConnection connection : ServerCore.instance().connections.values())
-									{
-										StringBuilder string = new StringBuilder();
-										string.append("User " + connection.getUserID() + " " + (connection.isAuthenticated() ? "(" + connection.user.username + ")" : "(no username found)"));
-										appendChat(string.toString());
-									}
-									
-									if(ServerCore.instance().connections.isEmpty())
-									{
-										appendChat("No users found on server.");
-									}
-								}
-								else {
-									appendChat("Usage: 'user list'");
 								}
 							}
 						}

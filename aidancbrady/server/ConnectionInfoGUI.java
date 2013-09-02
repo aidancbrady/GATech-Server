@@ -18,27 +18,23 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-public class ClientInfoGUI extends JFrame implements ActionListener, WindowListener
+public class ConnectionInfoGUI extends JFrame implements ActionListener, WindowListener
 {
 	private static final long serialVersionUID = 1L;
 	
-	private ServerConnection connection;
+	private int userID;
 	
 	private Timer timer;
 	
 	public JList messageList;
 	
-	public JLabel usernameLabel;
-	
 	public JLabel idLabel;
 	
-	public JLabel authLabel;
-	
-	public ClientInfoGUI(ServerConnection conn)
+	public ConnectionInfoGUI(int user)
 	{
-		super(conn.isAuthenticated() ? conn.user.username : "Guest");
+		super("Connection Information");
 		
-		connection = conn;
+		userID = user;
 		setBackground(Color.LIGHT_GRAY);
 		setResizable(false);
 		setSize(300, 400);
@@ -47,19 +43,8 @@ public class ClientInfoGUI extends JFrame implements ActionListener, WindowListe
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		
-		writeLabel(new JLabel("User Information"), new Font("Arial", Font.BOLD, 14));
-		idLabel = writeLabel(new JLabel("User ID: " + conn.getUserID()), new Font("Arial", Font.PLAIN, 14));
-		authLabel = writeLabel(new JLabel("Authenticated: " + conn.isAuthenticated()), new Font("Arial", Font.PLAIN, 14));
-		
-		if(conn.isAuthenticated())
-		{
-			usernameLabel = writeLabel(new JLabel("Username: " + conn.user.username), new Font("Arial", Font.PLAIN, 14));
-			usernameLabel.setVisible(true);
-		}
-		else {
-			usernameLabel = writeLabel(new JLabel(""), new Font("Arial", Font.PLAIN, 14));
-			usernameLabel.setVisible(false);
-		}
+		writeLabel(new JLabel("Connection Information"), new Font("Arial", Font.BOLD, 14));
+		idLabel = writeLabel(new JLabel("User ID: " + getConnection().getUserID()), new Font("Arial", Font.PLAIN, 14));
 		
 		messageList = new JList();
 		JScrollPane scroll = new JScrollPane(messageList);
@@ -73,6 +58,25 @@ public class ClientInfoGUI extends JFrame implements ActionListener, WindowListe
 		button.addActionListener(this);
 		getContentPane().add(button);
 		
+		JButton clearButton = new JButton("Clear");
+		clearButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		clearButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				getConnection().tempMessages.clear();
+				
+				if(getConnection().isAuthenticated())
+				{
+					getConnection().user.messages.clear();
+				}
+				
+				FileHandler.write();
+			}
+		});
+		getContentPane().add(clearButton);
+		
 		pack();
 		
 		timer = new Timer(100, new ActionListener()
@@ -80,38 +84,33 @@ public class ClientInfoGUI extends JFrame implements ActionListener, WindowListe
 			@Override
 			public void actionPerformed(ActionEvent event)
 			{
+				if(getConnection().isAuthenticated())
+				{
+					CacheInfoGUI cacheGui = new CacheInfoGUI(getConnection().user.username);
+					cacheGui.setLocation(getLocationOnScreen());
+					
+					timer.stop();
+					
+					try {
+						dispose();
+						setVisible(false);
+					} catch(Throwable t) {}
+					
+					return;
+				}
+				
 				int index = messageList.getSelectedIndex();
 				Vector<String> messages = new Vector<String>();
 				
-				if(connection.isAuthenticated())
+				for(String s : getConnection().tempMessages)
 				{
-					for(String s : connection.user.messages)
-					{
-						messages.add(s);
-					}
-				}
-				else {
-					for(String s : connection.tempMessages)
-					{
-						messages.add(s);
-					}
+					messages.add(s);
 				}
 				
 				messageList.setListData(messages);
 				messageList.setSelectedIndex(index);
 				
-				idLabel.setText("User ID: " + connection.getUserID());
-				authLabel.setText("Authenticated: " + connection.isAuthenticated());
-				
-				if(connection.isAuthenticated())
-				{
-					usernameLabel.setText("Username: " + connection.user.username);
-					usernameLabel.setVisible(true);
-				}
-				else {
-					usernameLabel.setText("");
-					usernameLabel.setVisible(false);
-				}
+				idLabel.setText("User ID: " + getConnection().getUserID());
 			}
 		});
 		
@@ -125,11 +124,16 @@ public class ClientInfoGUI extends JFrame implements ActionListener, WindowListe
 		getContentPane().add(label, "North");
 		return label;
 	}
+	
+	public ServerConnection getConnection()
+	{
+		return ServerCore.instance().connections.get(userID);
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) 
 	{
-		connection.socketConnection.kick();
+		getConnection().socketConnection.kick();
 		timer.stop();
 		
 		try {

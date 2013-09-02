@@ -28,15 +28,15 @@ public class CommandAuthenticate implements ICommand
 				return;
 			}
 			
-			if(ServerCore.instance().users.containsKey(params[1]))
+			if(ServerCore.instance().cachedUsers.containsKey(params[1]))
 			{
-				if(ServerCore.instance().users.get(params[1]).isOnline())
+				if(ServerCore.instance().cachedUsers.get(params[1]).isOnline())
 				{
 					printWriter.println("That username is already taken!");
 					return;
 				}
 				
-				connection.getServerConnection().user = ServerCore.instance().users.get(params[1]);
+				connection.getServerConnection().user = ServerCore.instance().cachedUsers.get(params[1]);
 				
 				ArrayList<String> list = Util.genericClone(connection.getServerConnection().tempMessages);
 				

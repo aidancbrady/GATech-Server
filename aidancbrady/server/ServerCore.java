@@ -20,7 +20,7 @@ public class ServerCore
 	public int usersConnected = 0;
 	
 	public Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
-	public Map<String, User> users = new HashMap<String, User>();
+	public Map<String, User> cachedUsers = new HashMap<String, User>();
 	
 	public ServerGui theGui;
 	
@@ -181,11 +181,15 @@ public class ServerCore
 			
 			System.out.println("Server initialized on port " + port);
 			
+			theGui.activeLabel.setText("Active -");
+			
 			theGui.setPortButton.setEnabled(false);
 			theGui.portEntry.setEnabled(false);
 			theGui.startServerButton.setEnabled(false);
 			theGui.stopServerButton.setEnabled(true);
-		} catch(Exception e) {}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void stop()
@@ -204,6 +208,8 @@ public class ServerCore
 			}
 			
 			System.out.println("Server deinitialized");
+			
+			theGui.activeLabel.setText("Inactive -");
 			
 			theGui.setPortButton.setEnabled(true);
 			theGui.portEntry.setEnabled(true);

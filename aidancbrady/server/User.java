@@ -11,7 +11,7 @@ public class User
 	{
 		username = name;
 		messages = message;
-		ServerCore.instance().users.put(username, this);
+		ServerCore.instance().cachedUsers.put(username, this);
 	}
 	
 	public void addMessage(String message)
@@ -25,24 +25,11 @@ public class User
 	
 	public boolean isOnline()
 	{
-		for(ServerConnection connection : ServerCore.instance().connections.values())
-		{
-			if(connection.user != null)
-			{
-				return connection.user.username == username;
-			}
-		}
-		
-		return false;
+		return getConnection() != null;
 	}
 	
 	public ServerConnection getConnection()
 	{
-		if(!isOnline())
-		{
-			return null;
-		}
-		
 		for(ServerConnection connection : ServerCore.instance().connections.values())
 		{
 			if(connection.user != null)

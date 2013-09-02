@@ -19,14 +19,14 @@ public class CommandUsername implements ICommand
 			
 			if(connection.getServerConnection().isAuthenticated())
 			{
-				if(ServerCore.instance().users.get(params[1]) != null)
+				if(ServerCore.instance().cachedUsers.get(params[1]) != null)
 				{
-					if(ServerCore.instance().users.get(params[1]).isOnline())
+					if(ServerCore.instance().cachedUsers.get(params[1]).isOnline())
 					{
 						printWriter.println("That username is already taken!");
 					}
 					else {
-						connection.getServerConnection().user = ServerCore.instance().users.get(params[1]);
+						connection.getServerConnection().user = ServerCore.instance().cachedUsers.get(params[1]);
 						printWriter.println("Successfully switched to user '" + params[1] + ".'");
 						ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + " has signed in as " + params[1] + ">");
 					}

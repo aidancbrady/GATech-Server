@@ -23,6 +23,7 @@ public class FileHandler
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			
 			String readingLine;
+			
 			while((readingLine = reader.readLine()) != null)
 			{
 				String[] lineSplit = readingLine.split(":");
@@ -40,7 +41,7 @@ public class FileHandler
 					}
 				}
 				
-				ServerCore.instance().users.put(username, new User(username, messagesList));
+				ServerCore.instance().cachedUsers.put(username, new User(username, messagesList));
 			}
 			
 			reader.close();
@@ -64,7 +65,7 @@ public class FileHandler
 			
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			
-			for(Map.Entry<String, User> entry : ServerCore.instance().users.entrySet())
+			for(Map.Entry<String, User> entry : ServerCore.instance().cachedUsers.entrySet())
 			{
 				StringBuilder builder = new StringBuilder(entry.getKey() + ":");
 				
