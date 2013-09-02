@@ -22,7 +22,7 @@ public class ServerCore
 	public Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
 	public Map<String, User> cachedUsers = new HashMap<String, User>();
 	
-	public ServerGui theGui;
+	public GuiServer theGui;
 	
 	public static void main(String[] args)
 	{
@@ -42,7 +42,7 @@ public class ServerCore
 			
 			System.out.println("Initializing...");
 			
-			theGui = new ServerGui();
+			theGui = new GuiServer();
 			
 			synchronized(this)
 			{

@@ -18,7 +18,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-public class ConnectionInfoGUI extends JFrame implements ActionListener, WindowListener
+public class GuiConnectionInfo extends JFrame implements ActionListener, WindowListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -30,7 +30,7 @@ public class ConnectionInfoGUI extends JFrame implements ActionListener, WindowL
 	
 	public JLabel idLabel;
 	
-	public ConnectionInfoGUI(int user)
+	public GuiConnectionInfo(int user)
 	{
 		super("Connection Information");
 		
@@ -86,7 +86,7 @@ public class ConnectionInfoGUI extends JFrame implements ActionListener, WindowL
 			{
 				if(getConnection().isAuthenticated())
 				{
-					CacheInfoGUI cacheGui = new CacheInfoGUI(getConnection().user.username);
+					GuiCacheInfo cacheGui = new GuiCacheInfo(getConnection().user.username);
 					cacheGui.setLocation(getLocationOnScreen());
 					
 					timer.stop();

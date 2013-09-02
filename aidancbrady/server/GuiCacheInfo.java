@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-public class CacheInfoGUI extends JFrame implements ActionListener, WindowListener
+public class GuiCacheInfo extends JFrame implements ActionListener, WindowListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -42,7 +42,7 @@ public class CacheInfoGUI extends JFrame implements ActionListener, WindowListen
 	
 	public JButton deauthButton;
 	
-	public CacheInfoGUI(String user)
+	public GuiCacheInfo(String user)
 	{
 		super("Cached User Information");
 		

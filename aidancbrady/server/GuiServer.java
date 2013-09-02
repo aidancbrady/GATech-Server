@@ -28,7 +28,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-public class ServerGui extends JFrame implements WindowListener
+public class GuiServer extends JFrame implements WindowListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -60,7 +60,7 @@ public class ServerGui extends JFrame implements WindowListener
 	
 	public Timer timer;
 	
-	public ServerGui()
+	public GuiServer()
 	{
 		super("Georgia Tech Chatserver");
 		
@@ -162,10 +162,10 @@ public class ServerGui extends JFrame implements WindowListener
 						{
 							if(!connection.isAuthenticated())
 							{
-								new ConnectionInfoGUI(id);
+								new GuiConnectionInfo(id);
 							}
 							else {
-								new CacheInfoGUI(connection.user.username);
+								new GuiCacheInfo(connection.user.username);
 							}
 						}
 					}
@@ -202,7 +202,7 @@ public class ServerGui extends JFrame implements WindowListener
 						
 						if(user != null)
 						{
-							new CacheInfoGUI(user.username);
+							new GuiCacheInfo(user.username);
 						}
 					}
 				}
@@ -241,13 +241,13 @@ public class ServerGui extends JFrame implements WindowListener
 		portEntry.setFocusable(true);
 		portEntry.setText("");
 		portEntry.setPreferredSize(new Dimension(140, 20));
-		portEntry.addActionListener(new PortEntryListener());
+		portEntry.addActionListener(new SetPortListener());
 		serverControlPanel.add(portEntry, "North");
 		
 		setPortButton = new JButton("Confirm");
 		setPortButton.setFocusable(true);
 		setPortButton.setPreferredSize(new Dimension(120, 25));
-		setPortButton.addActionListener(new SetPortButtonListener());
+		setPortButton.addActionListener(new SetPortListener());
 		
 		serverControlPanel.add(setPortButton, "Center");
 		
@@ -361,7 +361,7 @@ public class ServerGui extends JFrame implements WindowListener
 		chatBox.setCaretPosition(chatBox.getText().length() - 1);
 	}
 	
-	public class SetPortButtonListener implements ActionListener
+	public class SetPortListener implements ActionListener
 	{
 		@Override
 		public void actionPerformed(ActionEvent arg0) 
@@ -380,33 +380,7 @@ public class ServerGui extends JFrame implements WindowListener
 					portLabel.setText("" + ServerCore.instance().port);
 					portEntry.setText("");
 				} catch(Exception e) {
-					JOptionPane.showMessageDialog(ServerGui.this, "Invalid characters.", "Warning", JOptionPane.WARNING_MESSAGE);
-					portEntry.setText("");
-				}
-			}
-		}
-	}
-	
-	public class PortEntryListener implements ActionListener
-	{
-		@Override
-		public void actionPerformed(ActionEvent arg0) 
-		{
-			if(!ServerCore.instance().serverRunning)
-			{
-				String command = portEntry.getText().trim().toLowerCase();
-				
-				if(command == null || command.equals(""))
-				{
-					return;
-				}
-				
-				try {
-					ServerCore.instance().port = Integer.parseInt(command);
-					portLabel.setText("" + ServerCore.instance().port);
-					portEntry.setText("");
-				} catch(Exception e) {
-					JOptionPane.showMessageDialog(ServerGui.this, "Invalid characters.", "Warning", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(GuiServer.this, "Invalid characters.", "Warning", JOptionPane.WARNING_MESSAGE);
 					portEntry.setText("");
 				}
 			}
