@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -68,7 +69,7 @@ public class ServerGui extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent event)
 			{
-				int index = onlineUsersList.getSelectedIndex();
+				int onlineIndex = onlineUsersList.getSelectedIndex();
 				int offlineIndex = offlineUsersList.getSelectedIndex();
 				
 				Vector<String> userVector = new Vector<String>();
@@ -85,7 +86,7 @@ public class ServerGui extends JFrame implements WindowListener
 				}
 				
 				onlineUsersList.setListData(userVector);
-				onlineUsersList.setSelectedIndex(index);
+				onlineUsersList.setSelectedIndex(onlineIndex);
 				
 				if(userVector.size() == 1)
 				{
@@ -331,7 +332,16 @@ public class ServerGui extends JFrame implements WindowListener
 		clearChatButton.setVisible(true);
 		clearChatButton.setBackground(Color.WHITE);
 		clearChatButton.setFocusable(true);
-		clearChatButton.setPreferredSize(new Dimension(80, 40));
+		clearChatButton.setPreferredSize(new Dimension(60, 40));
+		clearChatButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				chatBox.setText("Chat cleared.");
+				appendChat("");
+			}
+		});
 		chatEntryPanel.add(clearChatButton, "East");
 		
 		mainPanel.add(chatEntryPanel, "South");
@@ -360,14 +370,19 @@ public class ServerGui extends JFrame implements WindowListener
 			{
 				String command = portEntry.getText().trim().toLowerCase();
 				
+				if(command == null || command.equals(""))
+				{
+					return;
+				}
+				
 				try {
 					ServerCore.instance().port = Integer.parseInt(command);
 					portLabel.setText("" + ServerCore.instance().port);
 					portEntry.setText("");
-				} catch(Exception e) {}
-			}
-			else {
-				
+				} catch(Exception e) {
+					JOptionPane.showMessageDialog(ServerGui.this, "Invalid characters.", "Warning", JOptionPane.WARNING_MESSAGE);
+					portEntry.setText("");
+				}
 			}
 		}
 	}
@@ -381,14 +396,19 @@ public class ServerGui extends JFrame implements WindowListener
 			{
 				String command = portEntry.getText().trim().toLowerCase();
 				
+				if(command == null || command.equals(""))
+				{
+					return;
+				}
+				
 				try {
 					ServerCore.instance().port = Integer.parseInt(command);
 					portLabel.setText("" + ServerCore.instance().port);
 					portEntry.setText("");
-				} catch(Exception e) {}
-			}
-			else {
-				
+				} catch(Exception e) {
+					JOptionPane.showMessageDialog(ServerGui.this, "Invalid characters.", "Warning", JOptionPane.WARNING_MESSAGE);
+					portEntry.setText("");
+				}
 			}
 		}
 	}
@@ -447,11 +467,6 @@ public class ServerGui extends JFrame implements WindowListener
 							appendChat("'user list' - lists all currently connected users.");
 							appendChat("'user cache <params>' - cache control panel.");
 						}
-					}
-					else if(command.equals("clear"))
-					{
-						chatBox.setText("Chat cleared.");
-						appendChat("");
 					}
 					else if(command.equals("help"))
 					{
