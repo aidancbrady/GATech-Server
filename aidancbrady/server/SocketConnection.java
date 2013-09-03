@@ -42,29 +42,27 @@ public class SocketConnection extends Thread
 				
 				if(readerLine.trim().startsWith("/"))
 				{
+					if(readerLine.trim().startsWith("/msg"))
+					{
+						String message = readerLine.trim().split(":")[1].trim();
+						
+						if(getServerConnection() != null && !message.isEmpty())
+						{
+							if(getServerConnection().isAuthenticated())
+							{
+								getServerConnection().user.addMessage(message);
+								ServerCore.instance().theGui.appendChat(getServerConnection().user.username + ": " + message);
+								ServerCore.instance().distributeMessage(getServerConnection().user.username + ": " + message);
+							}
+						}
+						
+						continue;
+					}
+					
 					CommandHandler handler = new CommandHandler(printWriter, readerLine.trim().toLowerCase().replace("/", ""));
 					handler.interpret().handle(this, handler);
+					
 					continue;
-				}
-				
-				try {
-					if(getServerConnection() != null && readerLine != null && readerLine.trim() != "" && !readerLine.isEmpty())
-					{
-						if(getServerConnection().isAuthenticated())
-						{
-							getServerConnection().user.addMessage(readerLine.trim());
-							ServerCore.instance().theGui.appendChat(getServerConnection().user.username + ": " + readerLine.trim());
-							ServerCore.instance().distributeMessageIgnore(userID, getServerConnection().user.username + ": " + readerLine.trim());
-						}
-						else {
-							ServerCore.instance().theGui.appendChat("Guest: " + readerLine.trim());
-							getServerConnection().tempMessages.add(readerLine.trim());
-							ServerCore.instance().distributeMessageIgnore(userID, "Guest: " + readerLine.trim());
-						}
-					}
-				} catch(Exception e) {
-					printWriter.println("Invalid message.");
-					e.printStackTrace();
 				}
 			}
 			
