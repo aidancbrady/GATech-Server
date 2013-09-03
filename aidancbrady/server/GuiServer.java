@@ -77,7 +77,10 @@ public class GuiServer extends JFrame implements WindowListener
 				
 				for(ServerConnection connection : ServerCore.instance().connections.values())
 				{
-					userVector.add(connection.getUserID() + ": " + (connection.isAuthenticated() ? connection.user.username : "Guest"));
+					if(connection.isAuthenticated())
+					{
+						userVector.add(connection.getUserID() + ": " + connection.user.username);
+					}
 				}
 				
 				if(userVector.isEmpty())
@@ -160,11 +163,8 @@ public class GuiServer extends JFrame implements WindowListener
 						
 						if(connection != null)
 						{
-							if(!connection.isAuthenticated())
+							if(connection.isAuthenticated())
 							{
-								new GuiConnectionInfo(id);
-							}
-							else {
 								new GuiCacheInfo(connection.user.username);
 							}
 						}

@@ -3,11 +3,8 @@ package aidancbrady.server;
 import java.io.PrintWriter;
 
 import aidancbrady.server.commands.CommandAuthenticate;
-import aidancbrady.server.commands.CommandDeauthenticate;
-import aidancbrady.server.commands.CommandDelete;
-import aidancbrady.server.commands.CommandHelp;
-import aidancbrady.server.commands.CommandWhois;
 import aidancbrady.server.commands.CommandUsername;
+import aidancbrady.server.commands.CommandWhois;
 
 public class CommandHandler 
 {
@@ -22,7 +19,7 @@ public class CommandHandler
 	
 	public CommandType interpret()
 	{
-		return CommandType.getFromName(command.split(" ")[0]);
+		return CommandType.getFromName(command.split(":")[0]);
 	}
 	
 	public String getCommand()
@@ -32,16 +29,12 @@ public class CommandHandler
 	
 	public static enum CommandType
 	{
-		USERNAME("username", " /username <username> - change your username", new CommandUsername()),
-		AUTHENTICATE("auth", " /auth - authenticate in network", new CommandAuthenticate()),
-		DEAUTHENTICATE("deauth", " /deauth - deauthenticate from network", new CommandDeauthenticate()),
-		WHOIS("whois", " /whois <id> - get information on a user ID", new CommandWhois()),
-		DELETE("delete", " /delete - delete your profile", new CommandDelete()),
-		HELP("help", " /help - view this page", new CommandHelp()),
-		UNKNOWN("null", "null", null);
+		USERNAME("username", new CommandUsername()),
+		AUTHENTICATE("auth", new CommandAuthenticate()),
+		WHOIS("whois", new CommandWhois()),
+		UNKNOWN("null", null);
 		
 		private String name;
-		private String usage;
 		private ICommand command;
 		
 		public static CommandType getFromName(String name)
@@ -57,11 +50,6 @@ public class CommandHandler
 			return UNKNOWN;
 		}
 		
-		public String getUsage()
-		{
-			return usage;
-		}
-		
 		public void handle(SocketConnection connection, CommandHandler handler)
 		{
 			if(equals(UNKNOWN))
@@ -70,14 +58,13 @@ public class CommandHandler
 				return;
 			}
 			
-			command.handle(connection, handler.command.split(" "), handler.printWriter);
+			command.handle(connection, handler.command.split(":"), handler.printWriter);
 			FileHandler.write();
 		}
 		
-		private CommandType(String s, String s1, ICommand icommand)
+		private CommandType(String s, ICommand icommand)
 		{
 			name = s;
-			usage = s1;
 			command = icommand;
 		}
 	}

@@ -40,8 +40,6 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 	
 	public JButton removeButton;
 	
-	public JButton deauthButton;
-	
 	public GuiCacheInfo(String user)
 	{
 		super("Cached User Information");
@@ -90,7 +88,7 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 			{
 				if(getUser().isOnline())
 				{
-					getUser().getConnection().deauthenticate();
+					getUser().getConnection().socketConnection.kick();
 				}
 				
 				ServerCore.instance().cachedUsers.remove(username);
@@ -105,17 +103,6 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 			}
 		});
 		rightButtons.add(removeButton);
-		
-		deauthButton = new JButton("Deauth");
-		deauthButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				getUser().getConnection().deauthenticate();
-			}
-		});
-		rightButtons.add(deauthButton);
 		
 		buttonPanel.add(rightButtons, "East");
 		
@@ -186,11 +173,9 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 				if(getUser().isOnline())
 				{
 					kickButton.setEnabled(true);
-					deauthButton.setEnabled(true);
 				}
 				else {
 					kickButton.setEnabled(false);
-					deauthButton.setEnabled(false);
 				}
 			}
 		});

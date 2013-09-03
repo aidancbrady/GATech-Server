@@ -31,7 +31,7 @@ public class SocketConnection extends Thread
 			bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			printWriter = new PrintWriter(socket.getOutputStream(), true);
 			
-			printWriter.println("Please identify yourself with a username.");
+			printWriter.println("Welcome to the AidanServer!");
 			
 			String readerLine = "";
 			boolean doneReading = false;
@@ -42,20 +42,6 @@ public class SocketConnection extends Thread
 				
 				if(readerLine.trim().startsWith("/"))
 				{
-					if(readerLine.trim().contains("/quit"))
-					{
-						printWriter.println(" -- Disconnecting -- ");
-						ServerCore.instance().theGui.appendChat("User " + userID + " has ended the connection.");
-						
-						if(getServerConnection().isAuthenticated())
-						{
-							ServerCore.instance().distributeMessageIgnore(userID, "<" + getServerConnection().user.username + " has quit>");
-						}
-						
-						doneReading = true;
-						break;
-					}
-					
 					CommandHandler handler = new CommandHandler(printWriter, readerLine.trim().toLowerCase().replace("/", ""));
 					handler.interpret().handle(this, handler);
 					continue;
@@ -82,10 +68,15 @@ public class SocketConnection extends Thread
 				}
 			}
 			
+			if(getServerConnection() != null && getServerConnection().isAuthenticated())
+			{
+				ServerCore.instance().theGui.appendChat("Closing connection with " + getServerConnection().user.username + ".");
+				ServerCore.instance().distributeMessage("<" + getServerConnection().user.username);
+			}
+			
 			ServerCore.instance().removeConnection(userID);
 
 			printWriter.println("Successfully closed connection!");
-			ServerCore.instance().theGui.appendChat("Closing connection with user '" + userID + ".'");
 			
 			bufferedReader.close();
 			printWriter.close();

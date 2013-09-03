@@ -14,12 +14,6 @@ public class ServerConnection
 		socketConnection = socket;
 	}
 	
-	public void deauthenticate()
-	{
-		ServerCore.instance().distributeMessage("<" + user.username + " has left>");
-		user = null;
-	}
-	
 	public int getUserID()
 	{
 		return socketConnection.userID;

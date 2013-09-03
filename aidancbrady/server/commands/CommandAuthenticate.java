@@ -24,7 +24,6 @@ public class CommandAuthenticate implements ICommand
 			
 			if(connection.getServerConnection().isAuthenticated())
 			{
-				printWriter.println("You are already authenticated!");
 				return;
 			}
 			
@@ -32,7 +31,7 @@ public class CommandAuthenticate implements ICommand
 			{
 				if(ServerCore.instance().cachedUsers.get(params[1]).isOnline())
 				{
-					printWriter.println("That username is already taken!");
+					printWriter.println("/warning:That username is already taken!");
 					return;
 				}
 				
