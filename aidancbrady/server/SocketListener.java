@@ -15,8 +15,6 @@ public class SocketListener extends Thread
 				
 				if(ServerCore.instance().serverRunning)
 				{
-					ServerCore.instance().theGui.appendChat("Connection: " + connection.getInetAddress().toString() + ":" + connection.getPort());
-					
 					SocketConnection socketConnection = new SocketConnection(ServerCore.instance().newConnection(), connection);
 					ServerCore.instance().connections.put(socketConnection.userID, new ServerConnection(socketConnection));
 					

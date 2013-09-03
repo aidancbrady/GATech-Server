@@ -29,7 +29,7 @@ public class CommandHandler
 	
 	public static enum CommandType
 	{
-		USERNAME("username", new CommandUsername()),
+		USERNAME("user", new CommandUsername()),
 		AUTHENTICATE("auth", new CommandAuthenticate()),
 		WHOIS("whois", new CommandWhois()),
 		UNKNOWN("null", null);
