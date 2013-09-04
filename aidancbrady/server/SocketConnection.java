@@ -44,7 +44,7 @@ public class SocketConnection extends Thread
 				{
 					if(readerLine.trim().startsWith("/msg"))
 					{
-						String message = readerLine.trim().split(":")[1].trim();
+						String message = Util.getMessage(readerLine.trim()).trim();
 						
 						if(getServerConnection() != null && !message.isEmpty())
 						{

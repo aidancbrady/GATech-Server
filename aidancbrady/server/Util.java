@@ -19,6 +19,29 @@ public final class Util
 		return toReturn;
 	}
 	
+	public static String getMessage(String toSplit)
+	{
+		StringBuilder builder = new StringBuilder();
+		boolean foundSplitter = false;
+		
+		for(Character c : toSplit.toCharArray())
+		{
+			if(!foundSplitter)
+			{
+				if(c.equals(':'))
+				{
+					foundSplitter = true;
+					continue;
+				}
+			}
+			else {
+				builder.append(c);
+			}
+		}
+		
+		return builder.toString();
+	}
+	
 	public static JLabel getWithFont(JLabel label, Font font)
 	{
 		label.setFont(font);
