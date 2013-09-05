@@ -39,6 +39,10 @@ public class ServerCore
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 		
 		try {
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "ServerCore");
+		} catch(Exception e) {}
+		
+		try {
 			FileHandler.read();
 			
 			System.out.println("Initializing...");

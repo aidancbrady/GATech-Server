@@ -11,9 +11,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -32,15 +34,13 @@ public class GuiServer extends JFrame implements WindowListener
 {
 	private static final long serialVersionUID = 1L;
 	
-	private JTextArea chatBox;
+	public JTextArea chatBox;
 	
-	private JList statistics;
+	public JList statistics;
 	
 	public JList onlineUsersList;
 	
 	public JList offlineUsersList;
-	
-	public JPanel serverControlPanel;
 	
 	public JButton setPortButton;
 	
@@ -137,11 +137,11 @@ public class GuiServer extends JFrame implements WindowListener
 		
 		JPanel completePanel = new JPanel(new BorderLayout());
 		
-		JPanel rightInfoPanel = new JPanel(new BorderLayout());
-		rightInfoPanel.setPreferredSize(new Dimension(206, 800));
-		
 		JPanel leftInfoPanel = new JPanel(new BorderLayout());
 		leftInfoPanel.setPreferredSize(new Dimension(206, 800));
+		
+		JPanel rightInfoPanel = new JPanel(new BorderLayout());
+		rightInfoPanel.setPreferredSize(new Dimension(206, 800));
 		
 		setBackground(Color.LIGHT_GRAY);
 		setResizable(false);
@@ -183,7 +183,7 @@ public class GuiServer extends JFrame implements WindowListener
 		onlineUsersList.setToolTipText("The users currently connected to this server.");
 		JScrollPane onlinePane = new JScrollPane(onlineUsersList);
 		onlinePane.setPreferredSize(new Dimension(256-15, 290));
-		leftInfoPanel.add(onlinePane, "North");
+		rightInfoPanel.add(onlinePane, "North");
 		//End user list panel
 		
 		//Start offline user list panel
@@ -219,16 +219,16 @@ public class GuiServer extends JFrame implements WindowListener
 		offlineUsersList.setToolTipText("The users cached in this server's database.");
 		JScrollPane offlinePane = new JScrollPane(offlineUsersList);
 		offlinePane.setPreferredSize(new Dimension(256-15, 290));
-		leftInfoPanel.add(offlinePane);
+		rightInfoPanel.add(offlinePane);
 		//End offline user list panel
 		
 		//Start port setter panel
-		serverControlPanel = new JPanel();
+		JPanel serverControlPanel = new JPanel();
 		serverControlPanel.setBorder(new TitledBorder(new EtchedBorder(), "Server Control"));
 		serverControlPanel.setVisible(true);
 		serverControlPanel.setBackground(Color.GRAY);
 		serverControlPanel.setFocusable(false);
-		serverControlPanel.setPreferredSize(new Dimension(206-15, 290));
+		serverControlPanel.setPreferredSize(new Dimension(206-15, 180));
 		serverControlPanel.setToolTipText("Set this server's active port to a new value.");
 		
 		activeLabel = Util.getWithFont(new JLabel("Inactive -"), new Font("Arial", Font.BOLD, 14));
@@ -248,7 +248,6 @@ public class GuiServer extends JFrame implements WindowListener
 		setPortButton.setFocusable(true);
 		setPortButton.setPreferredSize(new Dimension(120, 25));
 		setPortButton.addActionListener(new SetPortListener());
-		
 		serverControlPanel.add(setPortButton, "Center");
 		
 		startServerButton = new JButton("Start");
@@ -263,7 +262,6 @@ public class GuiServer extends JFrame implements WindowListener
 				ServerCore.instance().start();
 			}
 		});
-		
 		serverControlPanel.add(startServerButton, "South");
 		
 		stopServerButton = new JButton("Stop");
@@ -278,11 +276,62 @@ public class GuiServer extends JFrame implements WindowListener
 				ServerCore.instance().stop();
 			}
 		});
-	
 		serverControlPanel.add(stopServerButton, "South");
 		
-		rightInfoPanel.add(serverControlPanel, "North");
+		leftInfoPanel.add(serverControlPanel, "North");
 		//End port setter panel
+		
+		//Start discussion panel
+		JPanel discussionPanel = new JPanel();
+		discussionPanel.setBorder(new TitledBorder(new EtchedBorder(), "Discussion"));
+		discussionPanel.setVisible(true);
+		discussionPanel.setBackground(Color.GRAY);
+		discussionPanel.setFocusable(false);
+		discussionPanel.setToolTipText("Save and load discussions.");
+		
+		JButton saveButton = new JButton("Save");
+		saveButton.setFocusable(true);
+		saveButton.setPreferredSize(new Dimension(80, 25));
+		saveButton.setEnabled(true);
+		saveButton.addActionListener(new ActionListener() 
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				int returnVal = chooser.showSaveDialog(GuiServer.this);
+				
+				if(returnVal == JFileChooser.APPROVE_OPTION)
+				{
+					FileHandler.saveDiscussion(chooser.getSelectedFile());
+				}
+			}
+		});
+		discussionPanel.add(saveButton, "North");
+		
+		JButton loadButton = new JButton("Load");
+		loadButton.setFocusable(true);
+		loadButton.setPreferredSize(new Dimension(80, 25));
+		loadButton.setEnabled(true);
+		loadButton.addActionListener(new ActionListener() 
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				JFileChooser chooser = new JFileChooser();
+				int returnVal = chooser.showOpenDialog(GuiServer.this);
+				
+				if(returnVal == JFileChooser.APPROVE_OPTION)
+				{
+					FileHandler.loadDiscussion(chooser.getSelectedFile());
+				}
+			}
+		});
+		discussionPanel.add(loadButton, "North");
+		
+		leftInfoPanel.add(discussionPanel);
+		//End discussion management panel
 		
 		//Start statistics panel
 		statistics = new JList();
@@ -296,13 +345,14 @@ public class GuiServer extends JFrame implements WindowListener
 		statistics.setVisible(true);
 		statistics.setBackground(Color.GRAY);
 		statistics.setFocusable(false);
-		statistics.setPreferredSize(new Dimension(206-15, 164));
 		statistics.setToolTipText("Statistics regarding this server.");
-		rightInfoPanel.add(new JScrollPane(statistics));
+		JScrollPane statScroll = new JScrollPane(statistics);
+		statScroll.setPreferredSize(new Dimension(206-15, 180));
+		leftInfoPanel.add(statScroll, "South");
 		//End statistics panel
 		
-		completePanel.add(rightInfoPanel, "West");
-		completePanel.add(leftInfoPanel, "East");
+		completePanel.add(leftInfoPanel, "West");
+		completePanel.add(rightInfoPanel, "East");
 		
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
@@ -394,7 +444,7 @@ public class GuiServer extends JFrame implements WindowListener
 		{
 			try {
 				chatField.setText("");
-				String command = arg0.getActionCommand().trim().toLowerCase();
+				String command = arg0.getActionCommand().trim();
 				
 				if(command == null || command.equals(""))
 				{

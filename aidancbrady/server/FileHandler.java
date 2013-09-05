@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.swing.JFileChooser;
+
 public class FileHandler
 {
 	public static void read()
@@ -96,5 +98,54 @@ public class FileHandler
 	public static String getHomeDirectory()
 	{
 		return System.getProperty("user.home");
+	}
+	
+	public static void saveDiscussion(File file)
+	{
+		try {
+			if(file.exists())
+			{
+				file.delete();
+			}
+			
+			file.createNewFile();
+			
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			
+			writer.append(ServerCore.instance().theGui.chatBox.getText());
+			
+			writer.flush();
+			writer.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void loadDiscussion(File file)
+	{
+		try {
+			if(!file.exists())
+			{
+				return;
+			}
+			
+			StringBuilder builder = new StringBuilder();
+			
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			
+			String readingLine;
+			
+			while((readingLine = reader.readLine()) != null)
+			{
+				builder.append(readingLine);
+				builder.append("\n");
+			}
+			
+			ServerCore.instance().theGui.chatBox.setText(builder.toString());
+			
+			reader.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
