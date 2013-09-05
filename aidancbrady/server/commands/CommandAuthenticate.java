@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import aidancbrady.server.ICommand;
+import aidancbrady.server.ServerConnection;
 import aidancbrady.server.ServerCore;
 import aidancbrady.server.SocketConnection;
 import aidancbrady.server.User;
@@ -55,12 +56,23 @@ public class CommandAuthenticate implements ICommand
 				Collections.copy(newList, connection.getServerConnection().tempMessages);
 				connection.getServerConnection().user = new User(params[1], Util.genericClone(connection.getServerConnection().tempMessages));
 				connection.getServerConnection().tempMessages.clear();
-				printWriter.println("Username received. Welcome to the AidanServer!");
-				ServerCore.instance().theGui.appendChat("User " + connection.userID + " sent username '" + params[1] + ".'");
-				ServerCore.instance().distributeMessageIgnore(connection.userID, connection.getServerConnection().user.username + " has joined.");
+				printWriter.println("Welcome to the AidanServer!");
+			}
+			
+			for(ServerConnection conn : ServerCore.instance().connections.values())
+			{
+				if(conn.isAuthenticated())
+				{
+					if(conn.socketConnection.printWriter != null && conn != connection.getServerConnection())
+					{
+						conn.socketConnection.printWriter.println("/auth:" + connection.getServerConnection().user.username);
+					}
+					
+					printWriter.println("/popuser:" + conn.user.username);
+				}
 			}
 		} catch(Exception e) {
-			printWriter.println("Invalid command usage.");
+			e.printStackTrace();
 		}
 	}
 }
