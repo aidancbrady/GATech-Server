@@ -48,7 +48,7 @@ public class CommandAuthenticate implements ICommand
 				connection.getServerConnection().tempMessages.clear();
 				
 				printWriter.println("Welcome back, " + params[1]);
-				ServerCore.instance().theGui.appendChat("User '" + params[1] + "' has joined.");
+				ServerCore.instance().theGui.appendChat("<" + connection.getServerConnection().user.username + " has joined>");
 				ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + " has joined>");
 			}
 			else {
@@ -58,6 +58,9 @@ public class CommandAuthenticate implements ICommand
 				connection.getServerConnection().tempMessages.clear();
 				printWriter.println("Welcome to the AidanServer!");
 			}
+			
+			printWriter.println("/discname:" + ServerCore.instance().discussion);
+			printWriter.println("/chatlog:" + ServerCore.instance().theGui.chatBox.getText());
 			
 			for(ServerConnection conn : ServerCore.instance().connections.values())
 			{

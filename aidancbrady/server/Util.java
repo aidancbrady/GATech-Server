@@ -20,6 +20,24 @@ public final class Util
 		return toReturn;
 	}
 	
+	public static boolean isValidDiscussion(String discussion)
+	{
+		if(discussion.length() > 50)
+		{
+			return false;
+		}
+		
+		for(Character c : discussion.toCharArray())
+		{
+			if(!Character.isLetter(c) && !Character.isDigit(c))
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	public static String getMessage(String toSplit)
 	{
 		StringBuilder builder = new StringBuilder();

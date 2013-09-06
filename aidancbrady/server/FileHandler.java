@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 public class FileHandler
 {
@@ -100,9 +101,20 @@ public class FileHandler
 		return System.getProperty("user.home");
 	}
 	
-	public static void saveDiscussion(File file)
+	public static void saveDiscussion(String discussionName)
 	{
 		try {
+			File dir = new File(getHomeDirectory() + "/Documents/Discussions");
+			System.out.println(dir.getAbsolutePath());
+			
+			if(!dir.exists())
+			{
+				System.out.println("Yes");
+				dir.mkdir();
+			}
+			
+			File file = new File(getHomeDirectory() + "/Documents/Discussions/" + discussionName + ".disc");
+			
 			if(file.exists())
 			{
 				file.delete();
@@ -129,6 +141,12 @@ public class FileHandler
 				return;
 			}
 			
+			if(!file.getAbsolutePath().endsWith(".disc"))
+			{
+				JOptionPane.showMessageDialog(ServerCore.instance().theGui, "Please select a valid '.disc' discussion file to load.", "Warning", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			
 			StringBuilder builder = new StringBuilder();
 			
 			BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -141,7 +159,9 @@ public class FileHandler
 				builder.append("\n");
 			}
 			
+			ServerCore.instance().updateDiscussion(file.getName().replace(".", ":").split(":")[0]);
 			ServerCore.instance().theGui.chatBox.setText(builder.toString());
+			ServerCore.instance().syncChat();
 			
 			reader.close();
 		} catch(Exception e) {

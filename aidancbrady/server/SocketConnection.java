@@ -31,8 +31,6 @@ public class SocketConnection extends Thread
 			bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			printWriter = new PrintWriter(socket.getOutputStream(), true);
 			
-			printWriter.println("Successfully established connection.");
-			
 			String readerLine = "";
 			boolean doneReading = false;
 			
@@ -68,7 +66,7 @@ public class SocketConnection extends Thread
 			
 			if(getServerConnection() != null && getServerConnection().isAuthenticated())
 			{
-				ServerCore.instance().theGui.appendChat("Closing connection with " + getServerConnection().user.username + ".");
+				ServerCore.instance().theGui.appendChat("<" + getServerConnection().user.username + " has left>");
 				ServerCore.instance().distributeMessageIgnore(userID, "/deauth:" + getServerConnection().user.username);
 			}
 			

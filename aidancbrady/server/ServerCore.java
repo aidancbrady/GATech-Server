@@ -21,6 +21,8 @@ public class ServerCore
 	
 	public int usersConnected = 0;
 	
+	public String discussion;
+	
 	public Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
 	public Map<String, User> cachedUsers = new HashMap<String, User>();
 	
@@ -84,6 +86,40 @@ public class ServerCore
 	public static ServerCore instance()
 	{
 		return instance;
+	}
+	
+	public void updateDiscussion(String name)
+	{
+		if(name == null || name == "")
+		{
+			return;
+		}
+		
+		discussion = name;
+		theGui.discussionLabel.setText("Discussion: " + name);
+		syncDiscussionName(name);
+	}
+	
+	public void syncChat()
+	{
+		for(ServerConnection connection : connections.values())
+		{
+			if(connection.isAuthenticated())
+			{
+				connection.socketConnection.printWriter.println("/chatlog:" + theGui.chatBox.getText());
+			}
+		}
+	}
+	
+	public void syncDiscussionName(String name)
+	{
+		for(ServerConnection connection : connections.values())
+		{
+			if(connection.isAuthenticated())
+			{
+				connection.socketConnection.printWriter.println("/discname:" + name);
+			}
+		}
 	}
 	
 	/**
@@ -173,6 +209,12 @@ public class ServerCore
 	{
 		if(port == -1)
 		{
+			return;
+		}
+		
+		if(discussion == null || discussion.equals(""))
+		{
+			JOptionPane.showMessageDialog(theGui, "Please define a discussion name before starting.", "Warning", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		

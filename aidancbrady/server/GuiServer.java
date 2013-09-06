@@ -56,6 +56,10 @@ public class GuiServer extends JFrame implements WindowListener
 	
 	public JTextField chatField;
 	
+	public JTextField discussionEntry;
+	
+	public JLabel discussionLabel;
+	
 	public boolean isOpen = true;
 	
 	public Timer timer;
@@ -289,6 +293,23 @@ public class GuiServer extends JFrame implements WindowListener
 		discussionPanel.setFocusable(false);
 		discussionPanel.setToolTipText("Save and load discussions.");
 		
+		discussionLabel = new JLabel("Discussion: Undefined");
+		discussionPanel.add(discussionLabel, "North");
+		
+		discussionEntry = new JTextField();
+		discussionEntry.setFocusable(true);
+		discussionEntry.setText("");
+		discussionEntry.setPreferredSize(new Dimension(140, 20));
+		discussionEntry.addActionListener(new DiscussionListener());
+		discussionPanel.add(discussionEntry, "Center");
+		
+		JButton discussionButton = new JButton("Set");
+		discussionButton.setFocusable(true);
+		discussionButton.setPreferredSize(new Dimension(43, 25));
+		discussionButton.setEnabled(true);
+		discussionButton.addActionListener(new DiscussionListener());
+		discussionPanel.add(discussionButton, "Center");
+		
 		JButton saveButton = new JButton("Save");
 		saveButton.setFocusable(true);
 		saveButton.setPreferredSize(new Dimension(80, 25));
@@ -298,17 +319,15 @@ public class GuiServer extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				JFileChooser chooser = new JFileChooser();
-				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				int returnVal = chooser.showSaveDialog(GuiServer.this);
-				
-				if(returnVal == JFileChooser.APPROVE_OPTION)
+				if(ServerCore.instance().discussion == null || ServerCore.instance().discussion.isEmpty())
 				{
-					FileHandler.saveDiscussion(chooser.getSelectedFile());
+					return;
 				}
+				
+				FileHandler.saveDiscussion(ServerCore.instance().discussion);
 			}
 		});
-		discussionPanel.add(saveButton, "North");
+		discussionPanel.add(saveButton, "South");
 		
 		JButton loadButton = new JButton("Load");
 		loadButton.setFocusable(true);
@@ -319,7 +338,15 @@ public class GuiServer extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
+				File discussionsDir = new File(FileHandler.getHomeDirectory() + "/Documents/Discussions");
+				
+				if(!discussionsDir.exists())
+				{
+					discussionsDir.mkdir();
+				}
+				
 				JFileChooser chooser = new JFileChooser();
+				chooser.setCurrentDirectory(discussionsDir);
 				int returnVal = chooser.showOpenDialog(GuiServer.this);
 				
 				if(returnVal == JFileChooser.APPROVE_OPTION)
@@ -328,7 +355,7 @@ public class GuiServer extends JFrame implements WindowListener
 				}
 			}
 		});
-		discussionPanel.add(loadButton, "North");
+		discussionPanel.add(loadButton, "South");
 		
 		leftInfoPanel.add(discussionPanel);
 		//End discussion management panel
@@ -427,6 +454,7 @@ public class GuiServer extends JFrame implements WindowListener
 				
 				try {
 					ServerCore.instance().port = Integer.parseInt(command);
+					ServerCore.instance().syncDiscussionName(discussionEntry.getText());
 					portLabel.setText("" + ServerCore.instance().port);
 					portEntry.setText("");
 				} catch(Exception e) {
@@ -434,6 +462,28 @@ public class GuiServer extends JFrame implements WindowListener
 					portEntry.setText("");
 				}
 			}
+		}
+	}
+	
+	public class DiscussionListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent arg0)
+		{
+			if(discussionEntry.getText().isEmpty())
+			{
+				return;
+			}
+			
+			if(!Util.isValidDiscussion(discussionEntry.getText()))
+			{
+				JOptionPane.showMessageDialog(GuiServer.this, "Please enter a valid discussion name.\nDiscussion names have a maximum of 50 characters and include no special characters.", "Warning", JOptionPane.WARNING_MESSAGE);
+				discussionEntry.setText("");
+				return;
+			}
+			
+			ServerCore.instance().updateDiscussion(discussionEntry.getText());
+			discussionEntry.setText("");
 		}
 	}
 
