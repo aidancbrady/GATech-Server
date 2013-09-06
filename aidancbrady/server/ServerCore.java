@@ -106,7 +106,7 @@ public class ServerCore
 		{
 			if(connection.isAuthenticated())
 			{
-				connection.socketConnection.printWriter.println("/chatlog:" + theGui.chatBox.getText());
+				connection.socketConnection.printWriter.println("/chatlog:" + Util.convertForSync(theGui.chatBox.getText()));
 			}
 		}
 	}

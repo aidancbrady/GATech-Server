@@ -60,7 +60,7 @@ public class CommandAuthenticate implements ICommand
 			}
 			
 			printWriter.println("/discname:" + ServerCore.instance().discussion);
-			printWriter.println("/chatlog:" + ServerCore.instance().theGui.chatBox.getText());
+			printWriter.println("/chatlog:" + Util.convertForSync(ServerCore.instance().theGui.chatBox.getText()));
 			
 			for(ServerConnection conn : ServerCore.instance().connections.values())
 			{

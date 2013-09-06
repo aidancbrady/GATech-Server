@@ -20,6 +20,11 @@ public final class Util
 		return toReturn;
 	}
 	
+	public static String convertForSync(String chat)
+	{
+		return chat.replace("\n", "#NL#");
+	}
+	
 	public static boolean isValidDiscussion(String discussion)
 	{
 		if(discussion.length() > 50)

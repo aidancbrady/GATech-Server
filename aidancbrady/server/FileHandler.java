@@ -105,7 +105,6 @@ public class FileHandler
 	{
 		try {
 			File dir = new File(getHomeDirectory() + "/Documents/Discussions");
-			System.out.println(dir.getAbsolutePath());
 			
 			if(!dir.exists())
 			{
