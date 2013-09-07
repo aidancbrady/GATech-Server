@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 public class FileHandler
@@ -108,7 +107,6 @@ public class FileHandler
 			
 			if(!dir.exists())
 			{
-				System.out.println("Yes");
 				dir.mkdir();
 			}
 			

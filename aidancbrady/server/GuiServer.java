@@ -357,6 +357,33 @@ public class GuiServer extends JFrame implements WindowListener
 		});
 		discussionPanel.add(loadButton, "South");
 		
+		JButton deleteButton = new JButton("Delete");
+		deleteButton.setFocusable(true);
+		deleteButton.setPreferredSize(new Dimension(120, 25));
+		deleteButton.setEnabled(true);
+		deleteButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				if(ServerCore.instance().discussion == null || ServerCore.instance().discussion.equals(""))
+				{
+					return;
+				}
+				
+				File file = new File(FileHandler.getHomeDirectory() + "/Documents/Discussions/" + ServerCore.instance().discussion + ".disc");
+				
+				if(file.exists())
+				{
+					file.delete();
+				}
+				
+				ServerCore.instance().updateDiscussion(null);
+				ServerCore.instance().clearChat();
+			}
+		});
+		discussionPanel.add(deleteButton, "South");
+		
 		leftInfoPanel.add(discussionPanel);
 		//End discussion management panel
 		
@@ -415,8 +442,7 @@ public class GuiServer extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				chatBox.setText("Chat cleared.");
-				appendChat("");
+				ServerCore.instance().clearChat();
 			}
 		});
 		chatEntryPanel.add(clearChatButton, "East");
@@ -482,6 +508,11 @@ public class GuiServer extends JFrame implements WindowListener
 				return;
 			}
 			
+			if(ServerCore.instance().discussion != null && !ServerCore.instance().discussion.equals(""))
+			{
+				ServerCore.instance().clearChat();
+			}
+			
 			ServerCore.instance().updateDiscussion(discussionEntry.getText());
 			discussionEntry.setText("");
 		}
@@ -506,11 +537,7 @@ public class GuiServer extends JFrame implements WindowListener
 					command = command.substring(1);
 					String[] commandArgs = command.split(" ");
 					
-					if(command.equals("quit"))
-					{
-						windowClosing(null);
-					}
-					else if(command.startsWith("user"))
+					if(command.startsWith("user"))
 					{
 						if(commandArgs.length > 1)
 						{

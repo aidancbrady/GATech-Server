@@ -92,12 +92,28 @@ public class ServerCore
 	{
 		if(name == null || name == "")
 		{
+			discussion = null;
+			theGui.discussionLabel.setText("Discussion: Undefined");
+			syncDiscussionName(null);
 			return;
 		}
 		
 		discussion = name;
 		theGui.discussionLabel.setText("Discussion: " + name);
 		syncDiscussionName(name);
+	}
+	
+	public void clearChat()
+	{
+		theGui.chatBox.setText("");
+		
+		for(ServerConnection connection : ServerCore.instance().connections.values())
+		{
+			if(connection.isAuthenticated())
+			{
+				connection.socketConnection.printWriter.println("/clear");
+			}
+		}
 	}
 	
 	public void syncChat()
@@ -117,7 +133,13 @@ public class ServerCore
 		{
 			if(connection.isAuthenticated())
 			{
-				connection.socketConnection.printWriter.println("/discname:" + name);
+				if(name == null || name.equals(""))
+				{
+					connection.socketConnection.printWriter.println("/discname:");
+				}
+				else {
+					connection.socketConnection.printWriter.println("/discname:" + name);
+				}
 			}
 		}
 	}
@@ -209,12 +231,6 @@ public class ServerCore
 	{
 		if(port == -1)
 		{
-			return;
-		}
-		
-		if(discussion == null || discussion.equals(""))
-		{
-			JOptionPane.showMessageDialog(theGui, "Please define a discussion name before starting.", "Warning", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		

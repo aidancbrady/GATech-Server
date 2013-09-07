@@ -59,7 +59,14 @@ public class CommandAuthenticate implements ICommand
 				printWriter.println("Welcome to the AidanServer!");
 			}
 			
-			printWriter.println("/discname:" + ServerCore.instance().discussion);
+			if(ServerCore.instance().discussion == null || ServerCore.instance().discussion.equals(""))
+			{
+				printWriter.println("/discname:");
+			}
+			else {
+				printWriter.println("/discname:" + ServerCore.instance().discussion);
+			}
+			
 			printWriter.println("/chatlog:" + Util.convertForSync(ServerCore.instance().theGui.chatBox.getText()));
 			
 			for(ServerConnection conn : ServerCore.instance().connections.values())
