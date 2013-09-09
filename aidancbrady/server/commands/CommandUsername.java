@@ -13,13 +13,19 @@ public class CommandUsername implements ICommand
 	public void handle(SocketConnection connection, String[] params, PrintWriter printWriter)
 	{
 		try {
-			if(params.length != 2 || params[1] == null || params[1] == "")
+			if(params.length != 2 || params[1] == null || params[1].equals(""))
 			{
 				throw new Exception();
 			}
 			
 			if(connection.getServerConnection().isAuthenticated())
 			{
+				if(ServerCore.instance().displayName.equals(params[1]))
+				{
+					printWriter.println("You cannot use the same username as the moderator!");
+					return;
+				}
+				
 				if(ServerCore.instance().cachedUsers.get(params[1]) != null)
 				{
 					printWriter.println("There is already a user with that username!");

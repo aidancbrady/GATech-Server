@@ -14,6 +14,7 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.Vector;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -60,6 +61,10 @@ public class GuiServer extends JFrame implements WindowListener
 	
 	public JLabel discussionLabel;
 	
+	public JTextField displayNameEntry = null;
+	
+	public JLabel displayNameLabel;
+	
 	public boolean isOpen = true;
 	
 	public Timer timer;
@@ -79,17 +84,20 @@ public class GuiServer extends JFrame implements WindowListener
 				Vector<String> userVector = new Vector<String>();
 				Vector<String> offlineVector = new Vector<String>();
 				
+				if(ServerCore.instance().displayName != null)
+				{
+					userVector.add("0: [Mod] " + ServerCore.instance().displayName);
+				}
+				else {
+					userVector.add("0: [Mod] Undefined");
+				}
+				
 				for(ServerConnection connection : ServerCore.instance().connections.values())
 				{
 					if(connection.isAuthenticated())
 					{
 						userVector.add(connection.getUserID() + ": " + connection.user.username);
 					}
-				}
-				
-				if(userVector.isEmpty())
-				{
-					userVector.add("No users online.");
 				}
 				
 				onlineUsersList.setListData(userVector);
@@ -141,7 +149,8 @@ public class GuiServer extends JFrame implements WindowListener
 		
 		JPanel completePanel = new JPanel(new BorderLayout());
 		
-		JPanel leftInfoPanel = new JPanel(new BorderLayout());
+		JPanel leftInfoPanel = new JPanel();
+		leftInfoPanel.setLayout(new BoxLayout(leftInfoPanel, BoxLayout.Y_AXIS));
 		leftInfoPanel.setPreferredSize(new Dimension(206, 800));
 		
 		JPanel rightInfoPanel = new JPanel(new BorderLayout());
@@ -163,13 +172,17 @@ public class GuiServer extends JFrame implements WindowListener
 					if(!((String)onlineUsersList.getSelectedValue()).equals("No users online."))
 					{
 						int id = Integer.parseInt(((String)onlineUsersList.getSelectedValue()).split(":")[0]);
-						ServerConnection connection = ServerCore.instance().connections.get(id);
 						
-						if(connection != null)
+						if(id != 0)
 						{
-							if(connection.isAuthenticated())
+							ServerConnection connection = ServerCore.instance().connections.get(id);
+							
+							if(connection != null)
 							{
-								new GuiCacheInfo(connection.user.username);
+								if(connection.isAuthenticated())
+								{
+									new GuiCacheInfo(connection.user.username);
+								}
 							}
 						}
 					}
@@ -232,7 +245,7 @@ public class GuiServer extends JFrame implements WindowListener
 		serverControlPanel.setVisible(true);
 		serverControlPanel.setBackground(Color.GRAY);
 		serverControlPanel.setFocusable(false);
-		serverControlPanel.setPreferredSize(new Dimension(206-15, 180));
+		serverControlPanel.setPreferredSize(new Dimension(206-15, 70));
 		serverControlPanel.setToolTipText("Set this server's active port to a new value.");
 		
 		activeLabel = Util.getWithFont(new JLabel("Inactive -"), new Font("Arial", Font.BOLD, 14));
@@ -284,6 +297,34 @@ public class GuiServer extends JFrame implements WindowListener
 		
 		leftInfoPanel.add(serverControlPanel, "North");
 		//End port setter panel
+		
+		//Start display name panel
+		JPanel displayNamePanel = new JPanel();
+		displayNamePanel.setBorder(new TitledBorder(new EtchedBorder(), "Display Name"));
+		displayNamePanel.setVisible(true);
+		displayNamePanel.setBackground(Color.GRAY);
+		displayNamePanel.setFocusable(false);
+		displayNamePanel.setPreferredSize(new Dimension(206-15, 30));
+		displayNamePanel.setToolTipText("Set your display name to a new value.");
+		
+		displayNameLabel = new JLabel("Display Name: Undefined");
+		displayNamePanel.add(displayNameLabel);
+		
+		displayNameEntry = new JTextField();
+		displayNameEntry.setFocusable(true);
+		displayNameEntry.setText("");
+		displayNameEntry.setPreferredSize(new Dimension(140, 20));
+		displayNameEntry.addActionListener(new DisplayNameListener());
+		displayNamePanel.add(displayNameEntry);
+		
+		JButton displayNameButton = new JButton("Confirm");
+		displayNameButton.setFocusable(true);
+		displayNameButton.setPreferredSize(new Dimension(120, 25));
+		displayNameButton.addActionListener(new DisplayNameListener());
+		displayNamePanel.add(displayNameButton, "Center");
+		
+		leftInfoPanel.add(displayNamePanel);
+		//End display name panel
 		
 		//Start discussion panel
 		JPanel discussionPanel = new JPanel();
@@ -401,14 +442,14 @@ public class GuiServer extends JFrame implements WindowListener
 		statistics.setFocusable(false);
 		statistics.setToolTipText("Statistics regarding this server.");
 		JScrollPane statScroll = new JScrollPane(statistics);
-		statScroll.setPreferredSize(new Dimension(206-15, 180));
+		statScroll.setPreferredSize(new Dimension(206-15, 55));
 		leftInfoPanel.add(statScroll, "South");
 		//End statistics panel
 		
 		completePanel.add(leftInfoPanel, "West");
 		completePanel.add(rightInfoPanel, "East");
 		
-		JPanel mainPanel = new JPanel(new BorderLayout());
+		JPanel centerPanel = new JPanel(new BorderLayout());
 		
 		//Start chat box panel
 		chatBox = new JTextArea();
@@ -416,7 +457,7 @@ public class GuiServer extends JFrame implements WindowListener
 		chatBox.setBorder(new TitledBorder(new EtchedBorder(), "Chatbox"));
 		chatBox.setAutoscrolls(true);
 		chatBox.setBackground(Color.LIGHT_GRAY);
-		mainPanel.add(new JScrollPane(chatBox), "Center");
+		centerPanel.add(new JScrollPane(chatBox), "Center");
 		//End chat box panel
 		
 		JPanel chatEntryPanel = new JPanel(new BorderLayout());
@@ -447,9 +488,9 @@ public class GuiServer extends JFrame implements WindowListener
 		});
 		chatEntryPanel.add(clearChatButton, "East");
 		
-		mainPanel.add(chatEntryPanel, "South");
+		centerPanel.add(chatEntryPanel, "South");
 		
-		completePanel.add(mainPanel, "Center");
+		completePanel.add(centerPanel, "Center");
 		add(completePanel);
 		
 		addWindowListener(this);
@@ -462,6 +503,42 @@ public class GuiServer extends JFrame implements WindowListener
 	{	
 		chatBox.append(str+"\n");	
 		chatBox.setCaretPosition(chatBox.getText().length() - 1);
+	}
+	
+	public class DisplayNameListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent arg0)
+		{
+			if(displayNameEntry.getText() == null || displayNameEntry.getText().equals(""))
+			{
+				return;
+			}
+			
+			for(ServerConnection connection : ServerCore.instance().connections.values())
+			{
+				if(connection.isAuthenticated())
+				{
+					if(connection.user.username.equals(displayNameEntry.getText()))
+					{
+						JOptionPane.showMessageDialog(GuiServer.this, "This display name is already in use!", "Warning", JOptionPane.WARNING_MESSAGE);
+						displayNameEntry.setText("");
+						return;
+					}
+				}
+			}
+			
+			if(!Util.isValidDisplayName(displayNameEntry.getText()))
+			{
+				JOptionPane.showMessageDialog(GuiServer.this, "Invalid display name.\nA username must be at most 16 characters long,\nand only alphabetic characters or digits may be used.", "Warning", JOptionPane.WARNING_MESSAGE);
+				displayNameEntry.setText("");
+				return;
+			}
+			
+			ServerCore.instance().displayName = displayNameEntry.getText();
+			displayNameLabel.setText("Display Name: " + displayNameEntry.getText());
+			displayNameEntry.setText("");
+		}
 	}
 	
 	public class SetPortListener implements ActionListener
@@ -582,8 +659,11 @@ public class GuiServer extends JFrame implements WindowListener
 					}
 				}
 				else {
-					appendChat("Console: " + command);
-					ServerCore.instance().distributeMessage("Console: " + command);
+					if(ServerCore.instance().displayName != null)
+					{
+						appendChat(ServerCore.instance().displayName + ": " + command);
+						ServerCore.instance().distributeMessage(ServerCore.instance().displayName + ": " + command);
+					}
 				}
 			} catch (Exception e) {
 				appendChat("Error: " + e.getMessage());

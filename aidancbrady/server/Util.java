@@ -65,6 +65,24 @@ public final class Util
 		return builder.toString();
 	}
 	
+	public static boolean isValidDisplayName(String displayName)
+	{
+		if(displayName.length() > 16)
+		{
+			return false;
+		}
+		
+		for(Character c : displayName.toCharArray())
+		{
+			if(!Character.isLetter(c) && !Character.isDigit(c))
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	public static JLabel getWithFont(JLabel label, Font font)
 	{
 		label.setFont(font);

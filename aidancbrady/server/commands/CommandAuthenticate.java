@@ -28,6 +28,12 @@ public class CommandAuthenticate implements ICommand
 				return;
 			}
 			
+			if(ServerCore.instance().displayName.equals(params[1]))
+			{
+				printWriter.println("/warning:You cannot use the moderator's display name.");
+				return;
+			}
+			
 			if(ServerCore.instance().cachedUsers.containsKey(params[1]))
 			{
 				if(ServerCore.instance().cachedUsers.get(params[1]).isOnline())
@@ -68,6 +74,7 @@ public class CommandAuthenticate implements ICommand
 			}
 			
 			printWriter.println("/chatlog:" + Util.convertForSync(ServerCore.instance().theGui.chatBox.getText()));
+			printWriter.println("/popuser:" + ServerCore.instance().displayName + ":yes");
 			
 			for(ServerConnection conn : ServerCore.instance().connections.values())
 			{
@@ -78,7 +85,7 @@ public class CommandAuthenticate implements ICommand
 						conn.socketConnection.printWriter.println("/auth:" + connection.getServerConnection().user.username);
 					}
 					
-					printWriter.println("/popuser:" + conn.user.username);
+					printWriter.println("/popuser:" + conn.user.username + ":no");
 				}
 			}
 		} catch(Exception e) {

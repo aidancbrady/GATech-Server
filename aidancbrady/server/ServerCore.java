@@ -21,6 +21,8 @@ public class ServerCore
 	
 	public int usersConnected = 0;
 	
+	public String displayName;
+	
 	public String discussion;
 	
 	public Map<Integer, ServerConnection> connections = new HashMap<Integer, ServerConnection>();
@@ -231,6 +233,12 @@ public class ServerCore
 	{
 		if(port == -1)
 		{
+			return;
+		}
+		
+		if(displayName == null)
+		{
+			JOptionPane.showMessageDialog(theGui, "Please define a username before starting.", "Warning", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		
