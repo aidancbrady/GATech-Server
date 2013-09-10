@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 
 public class FileHandler
 {
-	public static void read()
+	public static void loadCaches()
 	{
 		try {
 			File file = new File(getHomeDirectory() + File.separator + "Server.txt");
@@ -53,7 +53,7 @@ public class FileHandler
 		}
 	}
 	
-	public static void write()
+	public static void saveCaches()
 	{
 		try {
 			File file = new File(getHomeDirectory() + File.separator + "Server.txt");
@@ -100,7 +100,7 @@ public class FileHandler
 		return System.getProperty("user.home");
 	}
 	
-	public static void saveDiscussion(String discussionName)
+	public static void saveDiscussion()
 	{
 		try {
 			File dir = new File(getHomeDirectory() + "/Documents/Discussions");
@@ -110,7 +110,7 @@ public class FileHandler
 				dir.mkdir();
 			}
 			
-			File file = new File(getHomeDirectory() + "/Documents/Discussions/" + discussionName + ".disc");
+			File file = new File(getHomeDirectory() + "/Documents/Discussions/" + ServerCore.instance().discussion + ".disc");
 			
 			if(file.exists())
 			{

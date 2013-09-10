@@ -59,7 +59,7 @@ public class CommandHandler
 			}
 			
 			command.handle(connection, handler.command.split(":"), handler.printWriter);
-			FileHandler.write();
+			FileHandler.saveCaches();
 		}
 		
 		private CommandType(String s, ICommand icommand)

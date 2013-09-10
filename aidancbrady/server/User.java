@@ -21,7 +21,7 @@ public class User
 		{
 			messages.add(message);
 			
-			FileHandler.write();
+			FileHandler.saveCaches();
 		}
 	}
 	

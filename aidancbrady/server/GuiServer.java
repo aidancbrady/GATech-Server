@@ -365,7 +365,7 @@ public class GuiServer extends JFrame implements WindowListener
 					return;
 				}
 				
-				FileHandler.saveDiscussion(ServerCore.instance().discussion);
+				FileHandler.saveDiscussion();
 			}
 		});
 		discussionPanel.add(saveButton, "South");
@@ -624,7 +624,7 @@ public class GuiServer extends JFrame implements WindowListener
 								{
 									int toRemove = ServerCore.instance().cachedUsers.size();
 									ServerCore.instance().cachedUsers.clear();
-									FileHandler.write();
+									FileHandler.saveCaches();
 									appendChat("Removed " + toRemove + " users from cache.");
 								}
 								else {

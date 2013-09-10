@@ -92,7 +92,7 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 				}
 				
 				ServerCore.instance().cachedUsers.remove(username);
-				FileHandler.write();
+				FileHandler.saveCaches();
 				
 				timer.stop();
 				
@@ -117,7 +117,7 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 			{
 				getUser().messages.clear();
 				
-				FileHandler.write();
+				FileHandler.saveCaches();
 			}
 		});
 		leftButtons.add(clearButton);

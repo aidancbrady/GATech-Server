@@ -47,7 +47,7 @@ public class ServerCore
 		} catch(Exception e) {}
 		
 		try {
-			FileHandler.read();
+			FileHandler.loadCaches();
 			
 			System.out.println("Initializing...");
 			
@@ -72,7 +72,7 @@ public class ServerCore
 			
 			connections.clear();
 			
-			FileHandler.write();
+			FileHandler.saveCaches();
 			System.out.println("Goodbye!");
 			System.exit(0);
 		} catch(Exception e) {

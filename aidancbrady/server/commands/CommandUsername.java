@@ -43,7 +43,7 @@ public class CommandUsername implements ICommand
 				
 				printWriter.println("/user:" + connection.getServerConnection().user.username);
 				
-				FileHandler.write();
+				FileHandler.saveCaches();
 			}
 		} catch(Exception e) {
 			printWriter.println("Invalid command usage.");
