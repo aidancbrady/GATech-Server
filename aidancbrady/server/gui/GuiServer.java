@@ -1,4 +1,4 @@
-package aidancbrady.server;
+package aidancbrady.server.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -20,16 +21,26 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import aidancbrady.server.FileHandler;
+import aidancbrady.server.ServerConnection;
+import aidancbrady.server.ServerCore;
+import aidancbrady.server.User;
+import aidancbrady.server.Util;
 
 public class GuiServer extends JFrame implements WindowListener
 {
@@ -64,6 +75,8 @@ public class GuiServer extends JFrame implements WindowListener
 	public JTextField displayNameEntry = null;
 	
 	public JLabel displayNameLabel;
+	
+	public ServerMenu serverMenu = new ServerMenu();
 	
 	public boolean isOpen = true;
 	
@@ -332,7 +345,7 @@ public class GuiServer extends JFrame implements WindowListener
 		discussionPanel.setVisible(true);
 		discussionPanel.setBackground(Color.GRAY);
 		discussionPanel.setFocusable(false);
-		discussionPanel.setToolTipText("Save and load discussions.");
+		discussionPanel.setToolTipText("Save and open discussions.");
 		
 		discussionLabel = new JLabel("Discussion: Undefined");
 		discussionPanel.add(discussionLabel, "North");
@@ -370,11 +383,11 @@ public class GuiServer extends JFrame implements WindowListener
 		});
 		discussionPanel.add(saveButton, "South");
 		
-		JButton loadButton = new JButton("Load");
-		loadButton.setFocusable(true);
-		loadButton.setPreferredSize(new Dimension(80, 25));
-		loadButton.setEnabled(true);
-		loadButton.addActionListener(new ActionListener() 
+		JButton openButton = new JButton("Open");
+		openButton.setFocusable(true);
+		openButton.setPreferredSize(new Dimension(80, 25));
+		openButton.setEnabled(true);
+		openButton.addActionListener(new ActionListener() 
 		{
 			@Override
 			public void actionPerformed(ActionEvent arg0)
@@ -392,11 +405,11 @@ public class GuiServer extends JFrame implements WindowListener
 				
 				if(returnVal == JFileChooser.APPROVE_OPTION)
 				{
-					FileHandler.loadDiscussion(chooser.getSelectedFile());
+					FileHandler.openDiscussion(chooser.getSelectedFile());
 				}
 			}
 		});
-		discussionPanel.add(loadButton, "South");
+		discussionPanel.add(openButton, "South");
 		
 		JButton deleteButton = new JButton("Delete");
 		deleteButton.setFocusable(true);
@@ -492,6 +505,9 @@ public class GuiServer extends JFrame implements WindowListener
 		
 		completePanel.add(centerPanel, "Center");
 		add(completePanel);
+		
+		setJMenuBar(serverMenu.menuBar);
+		//End menu bar
 		
 		addWindowListener(this);
 		setSize(854, 580);

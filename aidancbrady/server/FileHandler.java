@@ -130,7 +130,7 @@ public class FileHandler
 		}
 	}
 	
-	public static void loadDiscussion(File file)
+	public static void openDiscussion(File file)
 	{
 		try {
 			if(!file.exists())

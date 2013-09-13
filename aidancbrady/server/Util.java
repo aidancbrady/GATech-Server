@@ -1,6 +1,7 @@
 package aidancbrady.server;
 
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -87,5 +88,10 @@ public final class Util
 	{
 		label.setFont(font);
 		return label;
+	}
+	
+	public static int getActionKey()
+	{
+		return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 	}
 }

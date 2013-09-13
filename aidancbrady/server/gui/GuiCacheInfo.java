@@ -1,4 +1,4 @@
-package aidancbrady.server;
+package aidancbrady.server.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -19,6 +19,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
+
+import aidancbrady.server.FileHandler;
+import aidancbrady.server.ServerCore;
+import aidancbrady.server.User;
 
 public class GuiCacheInfo extends JFrame implements WindowListener
 {

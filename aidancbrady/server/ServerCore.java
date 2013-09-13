@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
+import aidancbrady.server.gui.GuiServer;
+
 public class ServerCore
 {
 	private static ServerCore instance;
@@ -44,6 +46,7 @@ public class ServerCore
 		
 		try {
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "ServerCore");
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		} catch(Exception e) {}
 		
 		try {
@@ -258,6 +261,9 @@ public class ServerCore
 			theGui.portEntry.setEnabled(false);
 			theGui.startServerButton.setEnabled(false);
 			theGui.stopServerButton.setEnabled(true);
+			
+			theGui.serverMenu.startItem.setEnabled(false);
+			theGui.serverMenu.stopItem.setEnabled(true);
 		} catch(BindException e) {
 			JOptionPane.showMessageDialog(theGui, "Permission denied.", "Warning", JOptionPane.WARNING_MESSAGE);
 		} catch(Exception e) {
@@ -288,6 +294,9 @@ public class ServerCore
 			theGui.portEntry.setEnabled(true);
 			theGui.startServerButton.setEnabled(true);
 			theGui.stopServerButton.setEnabled(false);
+			
+			theGui.serverMenu.startItem.setEnabled(true);
+			theGui.serverMenu.stopItem.setEnabled(false);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
