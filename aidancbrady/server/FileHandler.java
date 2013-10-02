@@ -12,6 +12,8 @@ import javax.swing.JOptionPane;
 
 public class FileHandler
 {
+	public static final File discussionsDir = new File(getHomeDirectory() + "/Documents/Discussions/Server");
+	
 	public static void loadCaches()
 	{
 		try {
@@ -103,14 +105,12 @@ public class FileHandler
 	public static void saveDiscussion()
 	{
 		try {
-			File dir = new File(getHomeDirectory() + "/Documents/Discussions");
-			
-			if(!dir.exists())
+			if(!discussionsDir.exists())
 			{
-				dir.mkdir();
+				discussionsDir.mkdir();
 			}
 			
-			File file = new File(getHomeDirectory() + "/Documents/Discussions/" + ServerCore.instance().discussion + ".disc");
+			File file = new File(discussionsDir.getAbsolutePath() + "/" + ServerCore.instance().discussion + ".disc");
 			
 			if(file.exists())
 			{

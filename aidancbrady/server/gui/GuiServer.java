@@ -392,15 +392,13 @@ public class GuiServer extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				File discussionsDir = new File(FileHandler.getHomeDirectory() + "/Documents/Discussions");
-				
-				if(!discussionsDir.exists())
+				if(!FileHandler.discussionsDir.exists())
 				{
-					discussionsDir.mkdir();
+					FileHandler.discussionsDir.mkdir();
 				}
 				
 				JFileChooser chooser = new JFileChooser();
-				chooser.setCurrentDirectory(discussionsDir);
+				chooser.setCurrentDirectory(FileHandler.discussionsDir);
 				int returnVal = chooser.showOpenDialog(GuiServer.this);
 				
 				if(returnVal == JFileChooser.APPROVE_OPTION)
@@ -679,6 +677,9 @@ public class GuiServer extends JFrame implements WindowListener
 					{
 						appendChat(ServerCore.instance().displayName + ": " + command);
 						ServerCore.instance().distributeMessage(ServerCore.instance().displayName + ": " + command);
+					}
+					else {
+						JOptionPane.showMessageDialog(GuiServer.this, "Please set a display name before entering a message.", "Warning", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			} catch (Exception e) {
