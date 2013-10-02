@@ -27,7 +27,7 @@ public final class Util
 	
 	public static boolean isValidDiscussion(String discussion)
 	{
-		if(discussion.length() > 50)
+		if(discussion.length() > 30)
 		{
 			return false;
 		}
@@ -88,6 +88,12 @@ public final class Util
 	{
 		label.setFont(font);
 		return label;
+	}
+	
+	public static void updateWithFont(JLabel label, String text, Font font)
+	{
+		label.setText(text);
+		label.setFont(font);
 	}
 	
 	public static int getActionKey()

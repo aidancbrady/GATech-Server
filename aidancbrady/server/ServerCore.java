@@ -1,10 +1,12 @@
 package aidancbrady.server;
 
+import java.awt.Font;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import aidancbrady.server.gui.GuiServer;
@@ -98,13 +100,13 @@ public class ServerCore
 		if(name == null || name == "")
 		{
 			discussion = null;
-			theGui.discussionLabel.setText("Discussion: Undefined");
+			Util.updateWithFont(theGui.discussionLabel, "Undefined", new Font("Arial", Font.BOLD, 14));
 			syncDiscussionName(null);
 			return;
 		}
 		
 		discussion = name;
-		theGui.discussionLabel.setText("Discussion: " + name);
+		Util.updateWithFont(theGui.discussionLabel, name, new Font("Arial", Font.BOLD, 14));
 		syncDiscussionName(name);
 	}
 	

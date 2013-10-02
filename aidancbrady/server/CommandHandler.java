@@ -3,6 +3,7 @@ package aidancbrady.server;
 import java.io.PrintWriter;
 
 import aidancbrady.server.commands.CommandAuthenticate;
+import aidancbrady.server.commands.CommandResync;
 import aidancbrady.server.commands.CommandUsername;
 import aidancbrady.server.commands.CommandWhois;
 
@@ -32,6 +33,7 @@ public class CommandHandler
 		USERNAME("user", new CommandUsername()),
 		AUTHENTICATE("auth", new CommandAuthenticate()),
 		WHOIS("whois", new CommandWhois()),
+		RESYNC("resync", new CommandResync()),
 		UNKNOWN("null", null);
 		
 		private String name;

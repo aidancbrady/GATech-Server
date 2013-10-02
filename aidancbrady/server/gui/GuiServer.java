@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -21,15 +20,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -332,7 +327,7 @@ public class GuiServer extends JFrame implements WindowListener
 		
 		JButton displayNameButton = new JButton("Confirm");
 		displayNameButton.setFocusable(true);
-		displayNameButton.setPreferredSize(new Dimension(120, 25));
+		displayNameButton.setPreferredSize(new Dimension(80, 25));
 		displayNameButton.addActionListener(new DisplayNameListener());
 		displayNamePanel.add(displayNameButton, "Center");
 		
@@ -347,7 +342,7 @@ public class GuiServer extends JFrame implements WindowListener
 		discussionPanel.setFocusable(false);
 		discussionPanel.setToolTipText("Save and open discussions.");
 		
-		discussionLabel = new JLabel("Discussion: Undefined");
+		discussionLabel = Util.getWithFont(new JLabel("Undefined"), new Font("Arial", Font.BOLD, 14));
 		discussionPanel.add(discussionLabel, "North");
 		
 		discussionEntry = new JTextField();
@@ -363,6 +358,9 @@ public class GuiServer extends JFrame implements WindowListener
 		discussionButton.setEnabled(true);
 		discussionButton.addActionListener(new DiscussionListener());
 		discussionPanel.add(discussionButton, "Center");
+		
+		JPanel discussionButtons = new JPanel();
+		discussionButtons.setBackground(Color.GRAY);
 		
 		JButton saveButton = new JButton("Save");
 		saveButton.setFocusable(true);
@@ -381,7 +379,7 @@ public class GuiServer extends JFrame implements WindowListener
 				FileHandler.saveDiscussion();
 			}
 		});
-		discussionPanel.add(saveButton, "South");
+		discussionButtons.add(saveButton);
 		
 		JButton openButton = new JButton("Open");
 		openButton.setFocusable(true);
@@ -407,7 +405,9 @@ public class GuiServer extends JFrame implements WindowListener
 				}
 			}
 		});
-		discussionPanel.add(openButton, "South");
+		discussionButtons.add(openButton);
+		
+		discussionPanel.add(discussionButtons, "South");
 		
 		JButton deleteButton = new JButton("Delete");
 		deleteButton.setFocusable(true);
@@ -423,7 +423,7 @@ public class GuiServer extends JFrame implements WindowListener
 					return;
 				}
 				
-				File file = new File(FileHandler.getHomeDirectory() + "/Documents/Discussions/" + ServerCore.instance().discussion + ".disc");
+				File file = new File(FileHandler.discussionsDir.getAbsolutePath() + "/" + ServerCore.instance().discussion + ".disc");
 				
 				if(file.exists())
 				{
@@ -434,7 +434,7 @@ public class GuiServer extends JFrame implements WindowListener
 				ServerCore.instance().clearChat();
 			}
 		});
-		discussionPanel.add(deleteButton, "South");
+		discussionPanel.add(deleteButton);
 		
 		leftInfoPanel.add(discussionPanel);
 		//End discussion management panel
@@ -641,32 +641,8 @@ public class GuiServer extends JFrame implements WindowListener
 									FileHandler.saveCaches();
 									appendChat("Removed " + toRemove + " users from cache.");
 								}
-								else {
-									appendChat("-- Cache Control Panel --");
-									appendChat("Command help:");
-									appendChat("'user cache info <username>' - gets and returns info from a user's cache.");
-									appendChat("'user cache remove <username>' - removes user's cache.");
-									appendChat("'user cache list' - lists out all the caches.");
-									appendChat("'user cache empty' - empties the server cache list.");
-								}
 							}
 						}
-						else {
-							appendChat("-- User Control Panel --");
-							appendChat("Command help:");
-							appendChat("'user info <ID>' - displays a user's information.");
-							appendChat("'user kick <ID>' - kicks a user from the server.");
-							appendChat("'user list' - lists all currently connected users.");
-							appendChat("'user cache <params>' - cache control panel.");
-						}
-					}
-					else if(command.equals("help"))
-					{
-						appendChat("-- Server Control Panel --");
-						appendChat("Command help:");
-						appendChat("'stop' - stops the server if it is running.");
-						appendChat("'quit' - stops the server if it is running and terminates the program.");
-						appendChat("'user <params>' - user control panel.");
 					}
 					else {
 						appendChat("Unknown command.");
