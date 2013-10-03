@@ -30,6 +30,8 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 	
 	private String username;
 	
+	private int onlineUserID = -1;
+	
 	private Timer timer;
 	
 	public JList messageList;
@@ -64,6 +66,7 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 			idLabel = writeLabel(new JLabel("User ID: " + getUser().getConnection().getUserID()), new Font("Arial", Font.PLAIN, 14));
 		}
 		else {
+			onlineUserID = -1;
 			idLabel = writeLabel(new JLabel("User ID: N/A"), new Font("Arial", Font.PLAIN, 14));
 		}
 		
@@ -153,6 +156,24 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 			@Override
 			public void actionPerformed(ActionEvent event)
 			{
+				if(ServerCore.instance().cachedUsers.get(username) == null)
+				{
+					if(onlineUserID != -1)
+					{
+						username = ServerCore.instance().connections.get(onlineUserID).user.username;
+						return;
+					}
+				}
+				
+				if(getUser() == null)
+				{
+					try {
+						dispose();
+						setVisible(false);
+						return;
+					} catch(Throwable t) {}
+				}
+				
 				int index = messageList.getSelectedIndex();
 				Vector<String> messages = new Vector<String>();
 				
@@ -168,7 +189,11 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 				
 				if(getUser().isOnline())
 				{
+					onlineUserID = getUser().getConnection().getUserID();
 					idLabel.setText("User ID: " + getUser().getConnection().getUserID());
+				}
+				else {
+					onlineUserID = -1;
 				}
 				
 				usernameLabel.setText("Username: " + getUser().username);
@@ -197,7 +222,13 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 	
 	public User getUser()
 	{
-		return ServerCore.instance().cachedUsers.get(username);
+		if(onlineUserID != -1 && ServerCore.instance().connections.get(onlineUserID) != null)
+		{
+			return ServerCore.instance().connections.get(onlineUserID).user;
+		}
+		else {
+			return ServerCore.instance().cachedUsers.get(username);
+		}
 	}
 	
 	@Override

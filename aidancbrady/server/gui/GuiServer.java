@@ -594,7 +594,7 @@ public class GuiServer extends JFrame implements WindowListener
 			
 			if(!Util.isValidDiscussion(discussionEntry.getText()))
 			{
-				JOptionPane.showMessageDialog(GuiServer.this, "Please enter a valid discussion name.\nDiscussion names have a maximum of 50 characters and include no special characters.", "Warning", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(GuiServer.this, "Please enter a valid discussion name.\nDiscussion names have a maximum of 18 characters and include no special characters.", "Warning", JOptionPane.WARNING_MESSAGE);
 				discussionEntry.setText("");
 				return;
 			}

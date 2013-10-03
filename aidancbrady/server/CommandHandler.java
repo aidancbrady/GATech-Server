@@ -20,12 +20,12 @@ public class CommandHandler
 	
 	public CommandType interpret()
 	{
-		return CommandType.getFromName(command.split(":")[0]);
+		return CommandType.getFromName(getCommand());
 	}
 	
 	public String getCommand()
 	{
-		return command.split(":")[0];
+		return command.split(":")[0].toLowerCase();
 	}
 	
 	public static enum CommandType

@@ -57,7 +57,7 @@ public class SocketConnection extends Thread
 						continue;
 					}
 					
-					CommandHandler handler = new CommandHandler(printWriter, readerLine.trim().toLowerCase().replace("/", ""));
+					CommandHandler handler = new CommandHandler(printWriter, readerLine.trim().replace("/", ""));
 					handler.interpret().handle(this, handler);
 					
 					continue;

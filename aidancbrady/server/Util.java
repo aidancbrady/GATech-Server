@@ -27,7 +27,7 @@ public final class Util
 	
 	public static boolean isValidDiscussion(String discussion)
 	{
-		if(discussion.length() > 30)
+		if(discussion.length() > 18)
 		{
 			return false;
 		}
