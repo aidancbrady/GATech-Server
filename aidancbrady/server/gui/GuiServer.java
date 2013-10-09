@@ -549,8 +549,8 @@ public class GuiServer extends JFrame implements WindowListener
 				return;
 			}
 			
-			ServerCore.instance().displayName = displayNameEntry.getText();
-			displayNameLabel.setText("Display Name: " + displayNameEntry.getText());
+			ServerCore.instance().setDisplayName(displayNameEntry.getText());
+			ServerCore.instance().syncDisplayName();
 			displayNameEntry.setText("");
 		}
 	}
@@ -570,9 +570,8 @@ public class GuiServer extends JFrame implements WindowListener
 				}
 				
 				try {
-					ServerCore.instance().port = Integer.parseInt(command);
-					ServerCore.instance().syncDiscussionName(discussionEntry.getText());
-					portLabel.setText("" + ServerCore.instance().port);
+					int port = Integer.parseInt(command);
+					ServerCore.instance().setPort(port);
 					portEntry.setText("");
 				} catch(Exception e) {
 					JOptionPane.showMessageDialog(GuiServer.this, "Invalid characters.", "Warning", JOptionPane.WARNING_MESSAGE);

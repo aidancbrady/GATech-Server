@@ -55,7 +55,7 @@ public class CommandAuthenticate implements ICommand
 				
 				printWriter.println("Welcome back, " + params[1]);
 				ServerCore.instance().theGui.appendChat("<" + connection.getServerConnection().user.username + " has joined>");
-				ServerCore.instance().distributeMessageIgnore(connection.userID, "<" + connection.getServerConnection().user.username + " has joined>");
+				printWriter.println("<" + connection.getServerConnection().user.username + " has joined>");
 			}
 			else {
 				ArrayList<String> newList = new ArrayList<String>(Arrays.asList(new String[connection.getServerConnection().tempMessages.size()]));

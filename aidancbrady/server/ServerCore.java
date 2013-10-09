@@ -6,7 +6,6 @@ import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import aidancbrady.server.gui.GuiServer;
@@ -47,7 +46,7 @@ public class ServerCore
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 		
 		try {
-			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "ServerCore");
+			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Chatter (Server)");
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		} catch(Exception e) {}
 		
@@ -57,6 +56,7 @@ public class ServerCore
 			System.out.println("Initializing...");
 			
 			theGui = new GuiServer();
+			FileHandler.loadProperties();
 			
 			synchronized(this)
 			{
@@ -102,12 +102,28 @@ public class ServerCore
 			discussion = null;
 			Util.updateWithFont(theGui.discussionLabel, "Undefined", new Font("Arial", Font.BOLD, 14));
 			syncDiscussionName(null);
+			FileHandler.saveProperties();
 			return;
 		}
 		
 		discussion = name;
 		Util.updateWithFont(theGui.discussionLabel, name, new Font("Arial", Font.BOLD, 14));
 		syncDiscussionName(name);
+		FileHandler.saveProperties();
+	}
+	
+	public void setPort(int i)
+	{
+		port = i;
+		theGui.portLabel.setText("" + ServerCore.instance().port);
+		FileHandler.saveProperties();
+	}
+	
+	public void setDisplayName(String name)
+	{
+		displayName = name;
+		theGui.displayNameLabel.setText("Display Name: " + name);
+		FileHandler.saveProperties();
 	}
 	
 	public void clearChat()
@@ -130,6 +146,20 @@ public class ServerCore
 			if(connection.isAuthenticated())
 			{
 				connection.socketConnection.printWriter.println("/chatlog:" + Util.convertForSync(theGui.chatBox.getText()));
+			}
+		}
+	}
+	
+	public void syncDisplayName()
+	{
+		for(ServerConnection connection : connections.values())
+		{
+			if(connection.isAuthenticated())
+			{
+				if(displayName != null)
+				{
+					connection.socketConnection.printWriter.println("/modname:" + displayName);
+				}
 			}
 		}
 	}

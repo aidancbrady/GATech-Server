@@ -67,7 +67,7 @@ public class SocketConnection extends Thread
 			if(getServerConnection() != null && getServerConnection().isAuthenticated())
 			{
 				ServerCore.instance().theGui.appendChat("<" + getServerConnection().user.username + " has left>");
-				ServerCore.instance().distributeMessageIgnore(userID, "/deauth:" + getServerConnection().user.username);
+				ServerCore.instance().distributeMessage("/deauth:" + getServerConnection().user.username);
 			}
 			
 			ServerCore.instance().removeConnection(userID);
@@ -88,10 +88,6 @@ public class SocketConnection extends Thread
 			{
 				kick();
 			}
-			
-			try {
-				finalize();
-			} catch(Throwable t1) {}
 		}
 	}
 	
@@ -107,12 +103,8 @@ public class SocketConnection extends Thread
 			printWriter.close();
 			socket.close();
 			
-			try {
-				finalize();
-			} catch (Throwable e) {
-				ServerCore.instance().theGui.appendChat("Unable to close connection thread! Error: " + e.getMessage());
-			}
-		} catch(Exception e) {
+			finalize();
+		} catch(Throwable e) {
 			if(!e.getMessage().trim().toLowerCase().equals("socket closed") && !e.getMessage().trim().toLowerCase().equals("socket is closed"))
 			{
 				ServerCore.instance().theGui.appendChat("Error: " + e.getMessage());
