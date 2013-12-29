@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 
 import aidancbrady.server.FileHandler;
 import aidancbrady.server.ICommand;
+import aidancbrady.server.ServerConnection;
 import aidancbrady.server.ServerCore;
 import aidancbrady.server.SocketConnection;
 
@@ -32,14 +33,27 @@ public class CommandUsername implements ICommand
 					return;
 				}
 				
-				ServerCore.instance().distributeMessage("<" + connection.getServerConnection().user.username + "'s username was changed to " + params[1] + ">");
-				ServerCore.instance().theGui.appendChat("<" + connection.getServerConnection().user.username + "'s username was changed to " + params[1] + ">");
+				String oldName = connection.getServerConnection().user.username;
+				
+				ServerCore.instance().distributeMessage("<" + oldName + "'s username was changed to " + params[1] + ">");
+				ServerCore.instance().theGui.appendChat("<" + oldName + "'s username was changed to " + params[1] + ">");
 				
 				ServerCore.instance().cachedUsers.remove(connection.getServerConnection().user.username);
 				connection.getServerConnection().user.username = params[1];
 				ServerCore.instance().cachedUsers.put(connection.getServerConnection().user.username, connection.getServerConnection().user);
 				
 				printWriter.println("/user:" + connection.getServerConnection().user.username);
+				
+				for(ServerConnection conn : ServerCore.instance().connections.values())
+				{
+					if(conn.isAuthenticated())
+					{
+						if(conn.socketConnection.printWriter != null)
+						{
+							conn.socketConnection.printWriter.println("/namechange:" + oldName + ":" + params[1]);
+						}
+					}
+				}
 				
 				FileHandler.saveCaches();
 			}

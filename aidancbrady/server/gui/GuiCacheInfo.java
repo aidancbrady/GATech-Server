@@ -194,6 +194,7 @@ public class GuiCacheInfo extends JFrame implements WindowListener
 				}
 				else {
 					onlineUserID = -1;
+					idLabel.setText("User ID: N/A");
 				}
 				
 				usernameLabel.setText("Username: " + getUser().username);
