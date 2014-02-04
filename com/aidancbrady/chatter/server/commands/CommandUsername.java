@@ -1,12 +1,12 @@
-package aidancbrady.server.commands;
+package com.aidancbrady.chatter.server.commands;
 
 import java.io.PrintWriter;
 
-import aidancbrady.server.FileHandler;
-import aidancbrady.server.ICommand;
-import aidancbrady.server.ServerConnection;
-import aidancbrady.server.ServerCore;
-import aidancbrady.server.SocketConnection;
+import com.aidancbrady.chatter.server.FileHandler;
+import com.aidancbrady.chatter.server.ICommand;
+import com.aidancbrady.chatter.server.ServerConnection;
+import com.aidancbrady.chatter.server.ServerCore;
+import com.aidancbrady.chatter.server.SocketConnection;
 
 public class CommandUsername implements ICommand
 {

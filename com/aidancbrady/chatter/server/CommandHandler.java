@@ -1,11 +1,11 @@
-package aidancbrady.server;
+package com.aidancbrady.chatter.server;
 
 import java.io.PrintWriter;
 
-import aidancbrady.server.commands.CommandAuthenticate;
-import aidancbrady.server.commands.CommandResync;
-import aidancbrady.server.commands.CommandUsername;
-import aidancbrady.server.commands.CommandWhois;
+import com.aidancbrady.chatter.server.commands.CommandAuthenticate;
+import com.aidancbrady.chatter.server.commands.CommandResync;
+import com.aidancbrady.chatter.server.commands.CommandUsername;
+import com.aidancbrady.chatter.server.commands.CommandWhois;
 
 public class CommandHandler 
 {

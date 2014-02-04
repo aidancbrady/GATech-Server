@@ -1,4 +1,4 @@
-package aidancbrady.server.gui;
+package com.aidancbrady.chatter.server.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,8 +9,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
-import aidancbrady.server.ServerCore;
-import aidancbrady.server.Util;
+import com.aidancbrady.chatter.server.ServerCore;
+import com.aidancbrady.chatter.server.Util;
 
 public class ServerMenu 
 {

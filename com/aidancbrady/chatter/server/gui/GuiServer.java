@@ -1,4 +1,4 @@
-package aidancbrady.server.gui;
+package com.aidancbrady.chatter.server.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -31,11 +31,11 @@ import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-import aidancbrady.server.FileHandler;
-import aidancbrady.server.ServerConnection;
-import aidancbrady.server.ServerCore;
-import aidancbrady.server.User;
-import aidancbrady.server.Util;
+import com.aidancbrady.chatter.server.FileHandler;
+import com.aidancbrady.chatter.server.ServerConnection;
+import com.aidancbrady.chatter.server.ServerCore;
+import com.aidancbrady.chatter.server.User;
+import com.aidancbrady.chatter.server.Util;
 
 public class GuiServer extends JFrame implements WindowListener
 {

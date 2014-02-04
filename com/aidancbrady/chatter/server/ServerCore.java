@@ -1,4 +1,4 @@
-package aidancbrady.server;
+package com.aidancbrady.chatter.server;
 
 import java.awt.Font;
 import java.net.BindException;
@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import aidancbrady.server.gui.GuiServer;
+import com.aidancbrady.chatter.server.gui.GuiServer;
 
 public class ServerCore
 {

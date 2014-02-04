@@ -1,4 +1,4 @@
-package aidancbrady.server;
+package com.aidancbrady.chatter.server;
 
 public class ScheduledTimer extends Thread
 {

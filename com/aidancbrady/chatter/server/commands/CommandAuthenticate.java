@@ -1,16 +1,16 @@
-package aidancbrady.server.commands;
+package com.aidancbrady.chatter.server.commands;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import aidancbrady.server.ICommand;
-import aidancbrady.server.ServerConnection;
-import aidancbrady.server.ServerCore;
-import aidancbrady.server.SocketConnection;
-import aidancbrady.server.User;
-import aidancbrady.server.Util;
+import com.aidancbrady.chatter.server.ICommand;
+import com.aidancbrady.chatter.server.ServerConnection;
+import com.aidancbrady.chatter.server.ServerCore;
+import com.aidancbrady.chatter.server.SocketConnection;
+import com.aidancbrady.chatter.server.User;
+import com.aidancbrady.chatter.server.Util;
 
 public class CommandAuthenticate implements ICommand
 {

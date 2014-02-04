@@ -1,4 +1,4 @@
-package aidancbrady.server;
+package com.aidancbrady.chatter.server;
 
 import java.awt.Font;
 import java.awt.Toolkit;

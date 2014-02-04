@@ -1,10 +1,10 @@
-package aidancbrady.server.commands;
+package com.aidancbrady.chatter.server.commands;
 
 import java.io.PrintWriter;
 
-import aidancbrady.server.ICommand;
-import aidancbrady.server.ServerCore;
-import aidancbrady.server.SocketConnection;
+import com.aidancbrady.chatter.server.ICommand;
+import com.aidancbrady.chatter.server.ServerCore;
+import com.aidancbrady.chatter.server.SocketConnection;
 
 public class CommandWhois implements ICommand
 {
